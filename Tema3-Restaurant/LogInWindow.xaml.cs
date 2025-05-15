@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Tema3_Restaurant.Data;
+using Tema3_Restaurant.Models;
 
 
 namespace Tema3_Restaurant
@@ -44,14 +45,22 @@ namespace Tema3_Restaurant
                 return;
             }
 
-            bool userValid = CheckUserInDatabase(email, password);
+            User userValid = CheckUserInDatabase(email, password);
 
-            if (userValid)
+            if (userValid != null)
             {
-                MessageBox.Show("Login successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                MenuWindow1 window1 = new MenuWindow1();
-                window1.Show();
-                this.Close();
+                if(userValid.Role == "Client")
+                {
+                    MessageBox.Show("Login successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MenuWindow1 window1 = new MenuWindow1();
+                    window1.Show();
+                    this.Close();
+                }
+                else if(userValid.Role == "Angajat")
+                {
+                    MessageBox.Show("Te ai conectat ca angajat!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                
             }
             else
             {
@@ -59,12 +68,11 @@ namespace Tema3_Restaurant
             }
         }
 
-        private bool CheckUserInDatabase(string email, string password)
+        private User CheckUserInDatabase(string email, string password)
         {
             using (var context = new RestaurantContext())
             {
-                var user = context.Users.FirstOrDefault(u => u.Email == email && u.Password == password);
-                return user != null;
+                return context.Users.FirstOrDefault(u => u.Email == email && u.Password == password);
             }
         }
     }

@@ -19,6 +19,14 @@ namespace Tema3_Restaurant.ViewModels
         private ObservableCollection<Menu> _menus;
         private Category _selectedCategory;
 
+        private string _searchKeyword;
+        private bool _searchContains = true;
+        private bool _searchDoesNotContain;
+        private bool _searchInName = true;
+        private bool _searchInAllergens;
+        private bool _isSearchActive;
+        private ObservableCollection<IGrouping<Category, object>> _groupedSearchResults;
+
         public ObservableCollection<Category> Categories
         {
             get { return _categories; }
@@ -57,18 +65,103 @@ namespace Tema3_Restaurant.ViewModels
                 _selectedCategory = value;
                 OnPropertyChanged();
                 LoadProductsAndMenusByCategory();
+
+                _isSearchActive = false;
             }
         }
+
+        public string SearchKeyword
+        {
+            get { return _searchKeyword; }
+            set
+            {
+                _searchKeyword = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool SearchContains
+        {
+            get { return _searchContains; }
+            set
+            {
+                _searchContains = value;
+                _searchDoesNotContain = !value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(SearchDoesNotContain));
+            }
+        }
+
+        public bool SearchDoesNotContain
+        {
+            get { return _searchDoesNotContain; }
+            set
+            {
+                _searchDoesNotContain = value;
+                _searchContains = !value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(SearchContains));
+            }
+        }
+
+        public bool SearchInName
+        {
+            get { return _searchInName; }
+            set
+            {
+                _searchInName = value;
+                _searchInAllergens = !value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(SearchInAllergens));
+            }
+        }
+
+        public bool SearchInAllergens
+        {
+            get { return _searchInAllergens; }
+            set
+            {
+                _searchInAllergens = value;
+                _searchInName = !value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(SearchInName));
+            }
+        }
+
+        public bool IsSearchActive
+        {
+            get { return _isSearchActive; }
+            set
+            {
+                _isSearchActive = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<IGrouping<Category, object>> GroupedSearchResults
+        {
+            get { return _groupedSearchResults; }
+            set
+            {
+                _groupedSearchResults = value;
+                OnPropertyChanged();
+            }
+        }
+
 
         public MenuViewModel()
         {
             LoadCategories();
             LoadAllProductsAndMenus();
+
+            GroupedSearchResults = new ObservableCollection<IGrouping<Category, object>>();
         }
+
+
 
         private void LoadCategories()
         {
-            using ( var context = new RestaurantContext())
+            using (var context = new RestaurantContext())
             {
                 Categories = new ObservableCollection<Category>(context.Categories.ToList());
             }
@@ -76,7 +169,7 @@ namespace Tema3_Restaurant.ViewModels
 
         private void LoadAllProductsAndMenus()
         {
-            using ( var context = new RestaurantContext())
+            using (var context = new RestaurantContext())
             {
                 var products = context.Products
                     .Include(p => p.Category)
@@ -154,10 +247,160 @@ namespace Tema3_Restaurant.ViewModels
                     _clearFilterCommand = new RelayCommand(() =>
                     {
                         SelectedCategory = null;
+                        SearchKeyword = string.Empty;
+                        IsSearchActive = false;
                     });
                 }
                 return _clearFilterCommand;
             }
+        }
+
+        private ICommand _searchCommand;
+
+        public ICommand SearchCommand
+        {
+            get
+            {
+                if (_searchCommand == null)
+                {
+                    _searchCommand = new RelayCommand(() =>
+                    {
+                        PerformSearch();
+                    });
+                }
+                return _searchCommand;
+            }
+        }
+
+        private void PerformSearch()
+        {
+            if (string.IsNullOrWhiteSpace(SearchKeyword))
+            {
+                // Dacă nu există cuvânt cheie, revenim la afișarea normală
+                IsSearchActive = false;
+                return;
+            }
+
+            List<Product> productsToSearch;
+            List<Menu> menusToSearch;
+
+            if (SelectedCategory != null)
+            {
+                productsToSearch = Products.ToList();
+                menusToSearch = Menus.ToList();
+            }
+            else
+            {
+                // Folosim toate produsele și meniurile
+                using (var context = new RestaurantContext())
+                {
+                    productsToSearch = context.Products
+                        .Include(p => p.Category)
+                        .Include(p => p.Images)
+                        .Include(p => p.ProductAllergens)
+                            .ThenInclude(pa => pa.Allergen)
+                        .Where(p => p.Available)
+                        .ToList();
+
+                    menusToSearch = context.Menus
+                        .Include(m => m.Category)
+                        .Include(m => m.MenuProducts)
+                            .ThenInclude(mp => mp.Product)
+                                .ThenInclude(p => p.ProductAllergens)
+                                    .ThenInclude(pa => pa.Allergen)
+                        .Include(m => m.MenuProducts)
+                            .ThenInclude(mp => mp.Product)
+                                .ThenInclude(p => p.Images)
+                        .Where(m => m.Available)
+                        .ToList();
+                }
+            }
+
+            var filteredItems = new List<object>();
+            string keyword = SearchKeyword.ToLower().Trim();
+
+            // Filtrăm produsele
+            foreach (var product in productsToSearch)
+            {
+                bool matchesSearch = false;
+
+                if (SearchInName)
+                {
+                    // Căutare în numele produsului
+                    bool containsKeyword = product.Name.ToLower().Contains(keyword);
+                    matchesSearch = SearchContains ? containsKeyword : !containsKeyword;
+                }
+                else if (SearchInAllergens)
+                {
+                    // Căutare în alergenii produsului
+                    bool containsAllergen = product.ProductAllergens != null &&
+                                         product.ProductAllergens.Any(pa =>
+                                             pa.Allergen.Name.ToLower().Contains(keyword));
+                    matchesSearch = SearchContains ? containsAllergen : !containsAllergen;
+                }
+
+                if (matchesSearch)
+                {
+                    filteredItems.Add(product);
+                }
+            }
+
+            // Filtrăm meniurile
+            foreach (var menu in menusToSearch)
+            {
+                bool matchesSearch = false;
+
+                if (SearchInName)
+                {
+                    // Căutare în numele meniului
+                    bool containsKeyword = menu.Name.ToLower().Contains(keyword);
+                    matchesSearch = SearchContains ? containsKeyword : !containsKeyword;
+                }
+                else if (SearchInAllergens)
+                {
+                    // Căutare în alergenii meniului (prin produsele meniului)
+                    bool containsAllergen = false;
+
+                    if (menu.MenuProducts != null)
+                    {
+                        foreach (var menuProduct in menu.MenuProducts)
+                        {
+                            if (menuProduct.Product.ProductAllergens != null &&
+                                menuProduct.Product.ProductAllergens.Any(pa =>
+                                    pa.Allergen.Name.ToLower().Contains(keyword)))
+                            {
+                                containsAllergen = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    matchesSearch = SearchContains ? containsAllergen : !containsAllergen;
+                }
+
+                if (matchesSearch)
+                {
+                    filteredItems.Add(menu);
+                }
+            }
+
+            // Grupăm rezultatele după categorie
+            var groupedItems = filteredItems
+                .GroupBy(item =>
+                {
+                    if (item is Product product)
+                        return product.Category;
+                    else if (item is Menu menu)
+                        return menu.Category;
+                    return null;
+                })
+                .Where(g => g.Key != null)
+                .OrderBy(g => g.Key.Name);
+
+            // Actualizăm colecția pentru afișare
+            GroupedSearchResults = new ObservableCollection<IGrouping<Category, object>>(groupedItems);
+            IsSearchActive = true;
+
         }
 
     }
