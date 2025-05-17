@@ -52,8 +52,8 @@ namespace Tema3_Restaurant
                 if(userValid.Role == "Client")
                 {
                     MessageBox.Show("Login successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                    MenuWindow1 window1 = new MenuWindow1();
-                    window1.Show();
+                    MenuWindow2 window2 = new MenuWindow2(userValid);
+                    window2.Show();
                     this.Close();
                 }
                 else if(userValid.Role == "Angajat")

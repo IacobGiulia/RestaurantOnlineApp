@@ -9,19 +9,19 @@
     <Grid>
         <TextBlock x:Name="Create_a_new_Account" HorizontalAlignment="Center" Margin="0,36,0,0" TextWrapping="Wrap" Text="Create a new Account" VerticalAlignment="Top" FontFamily="Cooper Black" Height="36" Width="216" FontSize="18"/>
         <TextBlock HorizontalAlignment="Left" Margin="78,94,0,0" TextWrapping="Wrap" Text="Enter Your First Name:" VerticalAlignment="Top" FontFamily="Cooper Black" FontSize="14" Height="23"/>
-        <TextBox HorizontalAlignment="Left" Margin="280,94,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="FirstNameTextBox" HorizontalAlignment="Left" Margin="280,94,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
         <TextBlock HorizontalAlignment="Left" Margin="78,141,0,0" TextWrapping="Wrap" Text="Enter Your Last Name:" VerticalAlignment="Top" FontFamily="Cooper Black" FontSize="14" Height="23"/>
-        <TextBox HorizontalAlignment="Left" Margin="280,141,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="LastNameTextBox" HorizontalAlignment="Left" Margin="280,141,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
         <TextBlock HorizontalAlignment="Left" Margin="78,194,0,0" TextWrapping="Wrap" Text="Enter Your Email:" VerticalAlignment="Top" FontFamily="Cooper Black" FontSize="14" Height="23"/>
-        <TextBox HorizontalAlignment="Left" Margin="292,194,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="238" Height="23"/>
+        <TextBox x:Name="EmailTextBox" HorizontalAlignment="Left" Margin="292,194,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="238" Height="23"/>
         <TextBlock HorizontalAlignment="Left" Margin="78,248,0,0" TextWrapping="Wrap" Text="Enter A Password:" VerticalAlignment="Top" FontFamily="Cooper Black" FontSize="14" Height="23"/>
         <TextBlock HorizontalAlignment="Left" Margin="78,300,0,0" TextWrapping="Wrap" Text="Enter Your Phone Number:" VerticalAlignment="Top" FontFamily="Cooper Black" FontSize="14" Height="23"/>
-        <TextBox HorizontalAlignment="Left" Margin="291,300,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="PhoneTextBox" HorizontalAlignment="Left" Margin="291,300,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
         <TextBlock HorizontalAlignment="Left" Margin="78,350,0,0" TextWrapping="Wrap" Text="Enter Your Address:" VerticalAlignment="Top" FontFamily="Cooper Black" FontSize="14" Height="23"/>
-        <TextBox HorizontalAlignment="Left" Margin="251,350,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="238" Height="23"/>
-        <Button Content="Create Account" HorizontalAlignment="Left" Margin="568,375,0,0" VerticalAlignment="Top" Width="106" FontFamily="Cooper Black" Height="20" Background="White"/>
+        <TextBox x:Name="AddressTextBox" HorizontalAlignment="Left" Margin="251,350,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="238" Height="23"/>
+        <Button x:Name="CreateAccountButton" Content="Create Account" HorizontalAlignment="Left" Margin="568,375,0,0" VerticalAlignment="Top" Width="106" FontFamily="Cooper Black" Height="20" Background="White" Click="CreateAccount_Click"/>
         <Button Content="Exit" HorizontalAlignment="Left" Margin="679,375,0,0" VerticalAlignment="Top" Width="91" FontFamily="Cooper Black" Background="White" Click="Exit_Click" Height="20"/>
-        <PasswordBox HorizontalAlignment="Left" Margin="278,248,0,0" VerticalAlignment="Top" Width="184" Height="23"/>
+        <PasswordBox x:Name="PasswordBox" HorizontalAlignment="Left" Margin="278,248,0,0" VerticalAlignment="Top" Width="184" Height="23"/>
 
     </Grid>
 </Window>

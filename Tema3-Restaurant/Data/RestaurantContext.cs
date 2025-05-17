@@ -57,7 +57,9 @@ namespace Tema3_Restaurant.Data
                 new ConfigurationApp { ID = 4, Key = "NumarComenziPentruDiscount", Value = "5" },
                 new ConfigurationApp { ID = 5, Key = "IntervalZilePentruDiscount", Value = "30" },
                 new ConfigurationApp { ID = 6, Key = "ProcentDiscountComenziMultiple", Value = "5" },
-                new ConfigurationApp { ID = 7, Key = "CantitateMinimaPreparat", Value = "5" }
+                new ConfigurationApp { ID = 7, Key = "CantitateMinimaPreparat", Value = "5" },
+                new ConfigurationApp { ID = 8, Key = "ProcentReducereComanda", Value = "10"},
+                new ConfigurationApp { ID = 9, Key = "ValoareMinimaPentruReducere", Value = "150"}
             );
 
             modelBuilder.Entity<Category>().HasData(

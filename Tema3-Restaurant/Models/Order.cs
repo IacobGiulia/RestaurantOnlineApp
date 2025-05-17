@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Tema3_Restaurant.Models
 {
     [Table("Orders")]
-    public class Order
+    public partial class Order
     {
         [Key]
         public int ID { get; set; }
