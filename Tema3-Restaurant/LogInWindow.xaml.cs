@@ -58,7 +58,10 @@ namespace Tema3_Restaurant
                 }
                 else if(userValid.Role == "Angajat")
                 {
-                    MessageBox.Show("Te ai conectat ca angajat!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("You are connected as admin!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    AdminWindow adminWindow = new AdminWindow(userValid);
+                    adminWindow.Show();
+                    this.Close();
                 }
                 
             }

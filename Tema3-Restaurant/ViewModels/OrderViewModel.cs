@@ -236,7 +236,7 @@ namespace Tema3_Restaurant.ViewModels
             {
                 if (_clearFilterCommand == null)
                 {
-                    _clearFilterCommand = new RelayCommand(() =>
+                    _clearFilterCommand = new RelayCommand((param) =>
                     {
                         SelectedCategory = null;
                         SearchKeyword = string.Empty;
@@ -255,7 +255,7 @@ namespace Tema3_Restaurant.ViewModels
             {
                 if (_searchCommand == null)
                 {
-                    _searchCommand = new RelayCommand(() =>
+                    _searchCommand = new RelayCommand((param) =>
                     {
                         PerformSearch();
                     });
