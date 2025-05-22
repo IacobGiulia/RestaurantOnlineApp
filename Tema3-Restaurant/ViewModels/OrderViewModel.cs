@@ -847,7 +847,7 @@ namespace Tema3_Restaurant.ViewModels
                                 order.Items.Add(orderItem);
 
                                 // If order state is "Se pregateste", update product quantities
-                                if (order.State == "Se pregateste")
+                                if (order.State == "In Preparation")
                                 {
                                     UpdateProductQuantities(context, cartItem);
                                 }
@@ -942,6 +942,7 @@ namespace Tema3_Restaurant.ViewModels
                     }
                 }
             }
+   
         }
 
         private void CancelOrder(object parameter)
@@ -987,10 +988,6 @@ namespace Tema3_Restaurant.ViewModels
             }
         }
 
-        //protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        //{
-        //    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        //}
     }
 
     

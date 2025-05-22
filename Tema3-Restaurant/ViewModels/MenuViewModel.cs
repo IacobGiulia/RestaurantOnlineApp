@@ -171,16 +171,25 @@ namespace Tema3_Restaurant.ViewModels
         {
             using (var context = new RestaurantContext())
             {
+                // Încărcăm produsele, inclusiv toate relațiile necesare
                 var products = context.Products
                     .Include(p => p.Category)
                     .Include(p => p.Images)
                     .Include(p => p.ProductAllergens)
                         .ThenInclude(pa => pa.Allergen)
-                    .Where(p => p.Available)
-                    .ToList();
+                    .ToList(); // Încărcăm toate produsele, indiferent de disponibilitate
 
-                Products = new ObservableCollection<Product>(products);
+                // Actualizăm proprietatea Available pentru fiecare produs
+                foreach (var product in products)
+                {
+                    // Considerăm un produs disponibil doar dacă are flagul Available = true
+                    // și cantitatea totală >= gramajul per porție
+                    product.Available = product.Available && product.TotalQuantity >= product.PortionQuantity;
+                }
 
+                Products = new ObservableCollection<Product>(products.Where(p => p.Available));
+
+                // Încărcăm meniurile, inclusiv toate relațiile necesare
                 var menus = context.Menus
                     .Include(m => m.Category)
                     .Include(m => m.MenuProducts)
@@ -190,11 +199,38 @@ namespace Tema3_Restaurant.ViewModels
                     .Include(m => m.MenuProducts)
                         .ThenInclude(mp => mp.Product)
                             .ThenInclude(p => p.Images)
-                    .Where(m => m.Available)
-                    .ToList();
+                    .ToList(); // Încărcăm toate meniurile, indiferent de disponibilitate
 
-                Menus = new ObservableCollection<Menu>((IEnumerable<Menu>)menus);
+                // Actualizăm proprietatea Available pentru fiecare meniu
+                foreach (var menu in menus)
+                {
+                    // Un meniu este disponibil doar dacă toate produsele sale sunt disponibile
+                    bool allProductsAvailable = true;
 
+                    if (menu.MenuProducts != null && menu.MenuProducts.Any())
+                    {
+                        foreach (var menuProduct in menu.MenuProducts)
+                        {
+                            if (menuProduct.Product != null)
+                            {
+                                // Actualizăm disponibilitatea produsului
+                                menuProduct.Product.Available = menuProduct.Product.Available &&
+                                                             menuProduct.Product.TotalQuantity >= menuProduct.Product.PortionQuantity;
+
+                                if (!menuProduct.Product.Available)
+                                {
+                                    allProductsAvailable = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    // Actualizăm disponibilitatea meniului
+                    menu.Available = menu.Available && allProductsAvailable;
+                }
+
+                Menus = new ObservableCollection<Menu>(menus.Where(m => m.Available));
             }
         }
 
@@ -217,7 +253,12 @@ namespace Tema3_Restaurant.ViewModels
                     .Where(p => p.CategoryID == SelectedCategory.ID && p.Available)
                     .ToList();
 
-                Products = new ObservableCollection<Product>(products);
+                foreach (var product in products)
+                {
+                    product.Available = product.Available && product.TotalQuantity >= product.PortionQuantity;
+                }
+
+                Products = new ObservableCollection<Product>(products.Where(p => p.Available));
 
 
                 var menus = context.Menus
@@ -232,7 +273,32 @@ namespace Tema3_Restaurant.ViewModels
                     .Where(m => m.CategoryID == SelectedCategory.ID && m.Available)
                     .ToList();
 
-                Menus = new ObservableCollection<Menu>((IEnumerable<Menu>)menus);
+                foreach (var menu in menus)
+                {
+                    bool allProductsAvailable = true;
+
+                    if (menu.MenuProducts != null && menu.MenuProducts.Any())
+                    {
+                        foreach (var menuProduct in menu.MenuProducts)
+                        {
+                            if (menuProduct.Product != null)
+                            {
+                                menuProduct.Product.Available = menuProduct.Product.Available &&
+                                                             menuProduct.Product.TotalQuantity >= menuProduct.Product.PortionQuantity;
+
+                                if (!menuProduct.Product.Available)
+                                {
+                                    allProductsAvailable = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    menu.Available = menu.Available && allProductsAvailable;
+                }
+
+                Menus = new ObservableCollection<Menu>(menus.Where(m => m.Available));
             }
         }
 
@@ -302,6 +368,11 @@ namespace Tema3_Restaurant.ViewModels
                         .Where(p => p.Available)
                         .ToList();
 
+                    foreach (var product in productsToSearch)
+                    {
+                        product.Available = product.Available && product.TotalQuantity >= product.PortionQuantity;
+                    }
+
                     menusToSearch = context.Menus
                         .Include(m => m.Category)
                         .Include(m => m.MenuProducts)
@@ -313,95 +384,120 @@ namespace Tema3_Restaurant.ViewModels
                                 .ThenInclude(p => p.Images)
                         .Where(m => m.Available)
                         .ToList();
-                }
-            }
 
-            var filteredItems = new List<object>();
-            string keyword = SearchKeyword.ToLower().Trim();
-
-            // Filtrăm produsele
-            foreach (var product in productsToSearch)
-            {
-                bool matchesSearch = false;
-
-                if (SearchInName)
-                {
-                    // Căutare în numele produsului
-                    bool containsKeyword = product.Name.ToLower().Contains(keyword);
-                    matchesSearch = SearchContains ? containsKeyword : !containsKeyword;
-                }
-                else if (SearchInAllergens)
-                {
-                    // Căutare în alergenii produsului
-                    bool containsAllergen = product.ProductAllergens != null &&
-                                         product.ProductAllergens.Any(pa =>
-                                             pa.Allergen.Name.ToLower().Contains(keyword));
-                    matchesSearch = SearchContains ? containsAllergen : !containsAllergen;
-                }
-
-                if (matchesSearch)
-                {
-                    filteredItems.Add(product);
-                }
-            }
-
-            // Filtrăm meniurile
-            foreach (var menu in menusToSearch)
-            {
-                bool matchesSearch = false;
-
-                if (SearchInName)
-                {
-                    // Căutare în numele meniului
-                    bool containsKeyword = menu.Name.ToLower().Contains(keyword);
-                    matchesSearch = SearchContains ? containsKeyword : !containsKeyword;
-                }
-                else if (SearchInAllergens)
-                {
-                    // Căutare în alergenii meniului (prin produsele meniului)
-                    bool containsAllergen = false;
-
-                    if (menu.MenuProducts != null)
+                    foreach (var menu in menusToSearch)
                     {
-                        foreach (var menuProduct in menu.MenuProducts)
+                        bool allProductsAvailable = true;
+
+                        if (menu.MenuProducts != null && menu.MenuProducts.Any())
                         {
-                            if (menuProduct.Product.ProductAllergens != null &&
-                                menuProduct.Product.ProductAllergens.Any(pa =>
-                                    pa.Allergen.Name.ToLower().Contains(keyword)))
+                            foreach (var menuProduct in menu.MenuProducts)
                             {
-                                containsAllergen = true;
-                                break;
+                                if (menuProduct.Product != null)
+                                {
+                                    menuProduct.Product.Available = menuProduct.Product.Available &&
+                                                                 menuProduct.Product.TotalQuantity >= menuProduct.Product.PortionQuantity;
+
+                                    if (!menuProduct.Product.Available)
+                                    {
+                                        allProductsAvailable = false;
+                                        break;
+                                    }
+                                }
                             }
                         }
+
+                        menu.Available = menu.Available && allProductsAvailable;
+                    }
+                }
+
+                var filteredItems = new List<object>();
+                string keyword = SearchKeyword.ToLower().Trim();
+
+                // Filtrăm produsele
+                foreach (var product in productsToSearch)
+                {
+                    bool matchesSearch = false;
+
+                    if (SearchInName)
+                    {
+                        // Căutare în numele produsului
+                        bool containsKeyword = product.Name.ToLower().Contains(keyword);
+                        matchesSearch = SearchContains ? containsKeyword : !containsKeyword;
+                    }
+                    else if (SearchInAllergens)
+                    {
+                        // Căutare în alergenii produsului
+                        bool containsAllergen = product.ProductAllergens != null &&
+                                             product.ProductAllergens.Any(pa =>
+                                                 pa.Allergen.Name.ToLower().Contains(keyword));
+                        matchesSearch = SearchContains ? containsAllergen : !containsAllergen;
                     }
 
-                    matchesSearch = SearchContains ? containsAllergen : !containsAllergen;
+                    if (matchesSearch)
+                    {
+                        filteredItems.Add(product);
+                    }
                 }
 
-                if (matchesSearch)
+                // Filtrăm meniurile
+                foreach (var menu in menusToSearch)
                 {
-                    filteredItems.Add(menu);
+                    bool matchesSearch = false;
+
+                    if (SearchInName)
+                    {
+                        // Căutare în numele meniului
+                        bool containsKeyword = menu.Name.ToLower().Contains(keyword);
+                        matchesSearch = SearchContains ? containsKeyword : !containsKeyword;
+                    }
+                    else if (SearchInAllergens)
+                    {
+                        // Căutare în alergenii meniului (prin produsele meniului)
+                        bool containsAllergen = false;
+
+                        if (menu.MenuProducts != null)
+                        {
+                            foreach (var menuProduct in menu.MenuProducts)
+                            {
+                                if (menuProduct.Product.ProductAllergens != null &&
+                                    menuProduct.Product.ProductAllergens.Any(pa =>
+                                        pa.Allergen.Name.ToLower().Contains(keyword)))
+                                {
+                                    containsAllergen = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        matchesSearch = SearchContains ? containsAllergen : !containsAllergen;
+                    }
+
+                    if (matchesSearch)
+                    {
+                        filteredItems.Add(menu);
+                    }
                 }
+
+                // Grupăm rezultatele după categorie
+                var groupedItems = filteredItems
+                    .GroupBy(item =>
+                    {
+                        if (item is Product product)
+                            return product.Category;
+                        else if (item is Menu menu)
+                            return menu.Category;
+                        return null;
+                    })
+                    .Where(g => g.Key != null)
+                    .OrderBy(g => g.Key.Name);
+
+                // Actualizăm colecția pentru afișare
+                GroupedSearchResults = new ObservableCollection<IGrouping<Category, object>>(groupedItems);
+                IsSearchActive = true;
+
             }
 
-            // Grupăm rezultatele după categorie
-            var groupedItems = filteredItems
-                .GroupBy(item =>
-                {
-                    if (item is Product product)
-                        return product.Category;
-                    else if (item is Menu menu)
-                        return menu.Category;
-                    return null;
-                })
-                .Where(g => g.Key != null)
-                .OrderBy(g => g.Key.Name);
-
-            // Actualizăm colecția pentru afișare
-            GroupedSearchResults = new ObservableCollection<IGrouping<Category, object>>(groupedItems);
-            IsSearchActive = true;
-
         }
-
     }
 }

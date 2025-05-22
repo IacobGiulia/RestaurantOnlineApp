@@ -37,11 +37,17 @@ namespace Tema3_Restaurant.Models
         [ForeignKey("CategoryID")]
         public virtual Category Category { get; set; }
 
-        public virtual ICollection<ProductImage> Images { get; set;}
+        public virtual ICollection<ProductImage> Images { get; set; }
         public virtual ICollection<ProductAllergen> ProductAllergens { get; set; }
         public virtual ICollection<MenuProduct> MenuProducts { get; set; }
 
         public string FirstImagePath => Images?.FirstOrDefault()?.Path;
+
+        [NotMapped]
+        public bool IsAvailable => Available && TotalQuantity >= PortionQuantity;
+
+        [NotMapped]
+        public string AvailabilityStatus => IsAvailable ? "" : "indisponibil";
 
     }
 }

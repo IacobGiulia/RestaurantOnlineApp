@@ -53,7 +53,7 @@
                     <TextBlock Text="Active Orders" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,5"/>
                 </Border>
                 <Grid Grid.Row="1">
-                    <ListView x:Name="LvActiveOrders">
+                    <ListView x:Name="LvActiveOrders"
                               BorderThickness="1" 
                               BorderBrush="#ddd" 
                               Background="White">
@@ -62,8 +62,8 @@
                                 <GridViewColumn Header="Date" DisplayMemberBinding="{Binding FormattedDate}" Width="140"/>
                                 <GridViewColumn Header="Code" DisplayMemberBinding="{Binding UniqueCode}" Width="100"/>
                                 <GridViewColumn Header="Status" DisplayMemberBinding="{Binding StatusWithColor}" Width="140"/>
-                                <GridViewColumn Header="Customer" DisplayMemberBinding="{Binding CustomerFullName}" Width="150"/>
-                                <GridViewColumn Header="Phone" DisplayMemberBinding="{Binding CustomerPhone}" Width="120"/>
+                                <GridViewColumn Header="Customer" DisplayMemberBinding="{Binding FullName}" Width="150"/>
+                                <GridViewColumn Header="Phone" DisplayMemberBinding="{Binding Phone}" Width="120"/>
                                 <GridViewColumn Header="Est. Delivery" DisplayMemberBinding="{Binding FormattedEstimatedDelivery}" Width="160"/>
                                 <GridViewColumn Header="Total" DisplayMemberBinding="{Binding TotalPrice, StringFormat='{}{0:C}'}" Width="80"/>
                             </GridView>

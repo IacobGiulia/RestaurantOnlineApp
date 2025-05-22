@@ -39,6 +39,7 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
                         <Button Content="Show All" Command="{Binding ClearFilterCommand}" Margin="10,0,0,0"/>
+                        <Button Content="Log Out" Click="ExitButton_Click" Margin="20,0,0,0" HorizontalAlignment="Right"/>
                     </StackPanel>
 
                     <Grid Grid.Row="1" Margin="10">

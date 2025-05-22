@@ -25,5 +25,12 @@ namespace Tema3_Restaurant
             InitializeComponent();
             DataContext = new MenuViewModel();
         }
+
+        private void ExitButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow window = new MainWindow();
+            window.Show();
+            this.Close();
+        }
     }
 }

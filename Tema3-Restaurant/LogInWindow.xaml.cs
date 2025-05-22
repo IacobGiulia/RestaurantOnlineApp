@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -73,6 +74,7 @@ namespace Tema3_Restaurant
 
         private User CheckUserInDatabase(string email, string password)
         {
+
             using (var context = new RestaurantContext())
             {
                 return context.Users.FirstOrDefault(u => u.Email == email && u.Password == password);

@@ -16,7 +16,7 @@ namespace Tema3_Restaurant.Models
         public int ID { get; set; }
 
         [Required, MaxLength(200)]
-        public string Name { get; set;}
+        public string Name { get; set; }
 
         [Required]
         public int CategoryID { get; set; }
@@ -34,9 +34,9 @@ namespace Tema3_Restaurant.Models
             get
             {
                 decimal price = 0;
-                if(MenuProducts != null)
+                if (MenuProducts != null)
                 {
-                    foreach(var mp in MenuProducts)
+                    foreach (var mp in MenuProducts)
                     {
                         price += mp.Product.Price * (mp.Quantity / mp.Product.PortionQuantity);
                     }
@@ -45,13 +45,34 @@ namespace Tema3_Restaurant.Models
                         var configuration = context.ConfigurationApp
                             .FirstOrDefault(c => c.Key == "ProcentReducereMeniu");
 
-                        if (configuration!= null && decimal.TryParse(configuration.Value, out decimal discountPercentage))
+                        if (configuration != null && decimal.TryParse(configuration.Value, out decimal discountPercentage))
                         {
                             price = price * (1 - (discountPercentage / 100));
                         }
                     }
                 }
                 return Math.Round(price, 2);
+            }
+        }
+
+        [NotMapped]
+        public bool IsAvailable
+        {
+            get
+            {
+                if (!Available) return false;
+
+                if (MenuProducts == null || !MenuProducts.Any()) return true;
+
+                foreach (var menuProduct in MenuProducts)
+                {
+                    if (!menuProduct.Product.IsAvailable)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
             }
         }
     }

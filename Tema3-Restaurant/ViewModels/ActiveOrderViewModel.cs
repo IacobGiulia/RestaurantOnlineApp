@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Tema3_Restaurant.ViewModels
 {
-    class ActiveOrderViewModel : BaseViewModel
+    public class ActiveOrderViewModel : BaseViewModel
     {
         public int ID { get; set; }
         public DateTime DateAndTime { get; set; }
@@ -23,7 +23,7 @@ namespace Tema3_Restaurant.ViewModels
         public string Address { get; set; }
 
         public string FormattedDate => DateAndTime.ToString("yyyy-MM-dd HH:mm");
-        public string FullName => $"{FirstName}{LastName}";
+        public string FullName => $"{FirstName} {LastName}";
 
         public string FormattedEstimatedDelivery => EstimatedDeliveryTime.HasValue? EstimatedDeliveryTime.Value.ToString("yyyy-MM-dd HH:mm") : "Not Set";
 

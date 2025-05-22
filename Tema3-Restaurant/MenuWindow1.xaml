@@ -16,7 +16,7 @@
         <converters:ProductTypeToVisibilityConverter x:Key="ProductTypeToVisibilityConverter"/>
         <converters:MenuTypeToVisibilityConverter x:Key="MenuTypeToVisibilityConverter"/>
     </Window.Resources>
-    
+
     <Grid>
 
         <Grid.RowDefinitions>
@@ -37,6 +37,7 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
             <Button Content="Show All" Command="{Binding ClearFilterCommand}" Margin="10,0,0,0"/>
+            <Button Content="Exit" Click="ExitButton_Click" Margin="20,0,0,0" HorizontalAlignment="Right"/>
         </StackPanel>
 
         <!-- Keyword Search Section -->
@@ -101,13 +102,18 @@
 
                                                     <!-- Product/Menu Image -->
                                                     <Border Grid.Column="0" Width="100" Height="100" 
-                                                           Background="White" Margin="0,0,10,0">
+                                                           Background="GhostWhite" Margin="0,0,10,0">
                                                         <Image Source="{Binding FirstImagePath}" Stretch="Uniform"/>
                                                     </Border>
 
                                                     <!-- Product/Menu Details -->
                                                     <StackPanel Grid.Column="1">
-                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
+                                                            <TextBlock Text=" (indisponibil)" Foreground="Red" FontWeight="Bold" FontSize="14" 
+                                                                     Visibility="{Binding IsAvailable, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                                                                     VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                                        </StackPanel>
                                                         <TextBlock Text="{Binding Category.Name}" FontStyle="Italic" Margin="0,5,0,5"/>
 
                                                         <!-- Display portion quantity for products -->
@@ -115,6 +121,8 @@
                                                             Converter={StaticResource ProductTypeToVisibilityConverter}}">
                                                             <Run Text="Portion: "/>
                                                             <Run Text="{Binding PortionQuantity, StringFormat='{}{0}g'}"/>
+                                                            <Run Text=" / Total: "/>
+                                                            <Run Text="{Binding TotalQuantity, StringFormat='{}{0}g'}"/>
                                                         </TextBlock>
 
                                                         <!-- Menu Items for menus -->
@@ -128,10 +136,14 @@
                                                                             <Grid.ColumnDefinitions>
                                                                                 <ColumnDefinition Width="*"/>
                                                                                 <ColumnDefinition Width="Auto"/>
+                                                                                <ColumnDefinition Width="Auto"/>
                                                                             </Grid.ColumnDefinitions>
                                                                             <TextBlock Grid.Column="0" Text="{Binding Product.Name}"/>
                                                                             <TextBlock Grid.Column="1" Text="{Binding Quantity, StringFormat='{}{0}g'}" 
                                                                                       Margin="10,0,0,0"/>
+                                                                            <TextBlock Grid.Column="2" Text=" (indisponibil)" Foreground="Red" 
+                                                                                      Visibility="{Binding Product.IsAvailable, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                                                                                      Margin="5,0,0,0"/>
                                                                         </Grid>
                                                                     </DataTemplate>
                                                                 </ItemsControl.ItemTemplate>
@@ -155,8 +167,8 @@
                                                             </ItemsControl>
                                                         </StackPanel>
                                                     </StackPanel>
-                                                    
-                                                    
+
+
 
                                                     <!-- Price -->
                                                     <StackPanel Grid.Column="2" VerticalAlignment="Top">
@@ -200,11 +212,18 @@
 
                                     <!-- Product Details -->
                                     <StackPanel Grid.Column="1">
-                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
+                                            <TextBlock Text=" (indisponibil)" Foreground="Red" FontWeight="Bold" FontSize="14" 
+                                                     Visibility="{Binding IsAvailable, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                                                     VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                        </StackPanel>
                                         <TextBlock Text="{Binding Category.Name}" FontStyle="Italic" Margin="0,5,0,5"/>
                                         <TextBlock>
                                             <Run Text="Portion: "/>
                                             <Run Text="{Binding PortionQuantity, StringFormat='{}{0}g'}"/>
+                                            <Run Text=" / Total: "/>
+                                            <Run Text="{Binding TotalQuantity, StringFormat='{}{0}g'}"/>
                                         </TextBlock>
 
                                         <!-- Allergens -->
@@ -252,7 +271,12 @@
 
                                     <!-- Menu Details -->
                                     <StackPanel Grid.Column="0">
-                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
+                                            <TextBlock Text=" (indisponibil)" Foreground="Red" FontWeight="Bold" FontSize="14" 
+                                                     Visibility="{Binding IsAvailable, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                                                     VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                        </StackPanel>
                                         <TextBlock Text="{Binding Category.Name}" FontStyle="Italic" Margin="0,5,0,5"/>
 
                                         <!-- Menu Items -->
@@ -264,9 +288,13 @@
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="*"/>
                                                             <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Grid.Column="0" Text="{Binding Product.Name}"/>
                                                         <TextBlock Grid.Column="1" Text="{Binding Quantity, StringFormat='{}{0}g'}" Margin="10,0,0,0"/>
+                                                        <TextBlock Grid.Column="2" Text=" (indisponibil)" Foreground="Red" 
+                                                                  Visibility="{Binding Product.IsAvailable, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                                                                  Margin="5,0,0,0"/>
                                                     </Grid>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>

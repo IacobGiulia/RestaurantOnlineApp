@@ -27,9 +27,18 @@ namespace Tema3_Restaurant.Data
 
         public DbSet<ConfigurationApp> ConfigurationApp { get; set; }
 
+        public RestaurantContext() : base()
+        {
+
+        }
+        public RestaurantContext(DbContextOptions<RestaurantContext> options)
+            : base(options)
+        {
+        }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=localhost;Database=RestaurantDB;Trusted_Connection=True;TrustServerCertificate=True;");
+            if (!optionsBuilder.IsConfigured)
+                optionsBuilder.UseSqlServer(@"Server=localhost;Database=RestaurantDB;Trusted_Connection=True;TrustServerCertificate=True;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

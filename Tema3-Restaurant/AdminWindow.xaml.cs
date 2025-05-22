@@ -1,23 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Microsoft.EntityFrameworkCore;
-using System.Data.SqlClient;
-using System.Windows.Shapes;
+using System.Data;
 using Tema3_Restaurant.Data;
 using Tema3_Restaurant.Models;
-using System.Data;
 using Tema3_Restaurant.ViewModels;
 
 namespace Tema3_Restaurant
@@ -27,27 +17,48 @@ namespace Tema3_Restaurant
     /// </summary>
     public partial class AdminWindow : Window
     {
-        private readonly RestaurantContext _context;
+        private RestaurantContext _context;
         private readonly User _currentUser;
         private ObservableCollection<ActiveOrderViewModel> _activeOrders;
         private ObservableCollection<LowStockProductViewModel> _lowStockProducts;
         private decimal _lowStockThreshold;
+
         public AdminWindow(User user)
         {
             InitializeComponent();
-            _context = new RestaurantContext();
+
             _currentUser = user;
             _activeOrders = new ObservableCollection<ActiveOrderViewModel>();
             _lowStockProducts = new ObservableCollection<LowStockProductViewModel>();
 
             TxtEmployeeName.Text = $"Welcome, {_currentUser.FirstName} {_currentUser.LastName}";
 
-            LoadConfiguration();
-            LoadActiveOrders();
-            LoadLowStockProducts();
+            // Initialize the database context
+            InitializeContext();
+
+            try
+            {
+                LoadConfiguration();
+                LoadActiveOrders();
+                LoadLowStockProducts();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading data: {ex.Message}", "Database Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
 
             LvActiveOrders.ItemsSource = _activeOrders;
             LvLowStockProducts.ItemsSource = _lowStockProducts;
+        }
+
+        // Separate method to initialize or reinitialize the context
+        private void InitializeContext()
+        {
+            // Dispose the old context if it exists
+            _context?.Dispose();
+
+            // Create a new context
+            _context = new RestaurantContext();
         }
 
         private void LoadConfiguration()
@@ -66,72 +77,104 @@ namespace Tema3_Restaurant
         private void LoadActiveOrders()
         {
             _activeOrders.Clear();
-            using (var conn = _context.Database.GetDbConnection())
+
+            try
             {
-                conn.Open();
-                using(var command = conn.CreateCommand())
+                // Create a new context specifically for this operation
+                using (var orderContext = new RestaurantContext())
                 {
-                    command.CommandText = "GetActiveOrdersSorted";
-                    command.CommandType = CommandType.StoredProcedure;
-
-                    using(var reader = command.ExecuteReader())
+                    using (var conn = orderContext.Database.GetDbConnection())
                     {
-                        while(reader.Read())
+                        conn.Open();
+                        using (var command = conn.CreateCommand())
                         {
-                            var order = new ActiveOrderViewModel
-                            {
-                                ID = reader.GetInt32(reader.GetOrdinal("ID")),
-                                DateAndTime = reader.GetDateTime(reader.GetOrdinal("DateAndTime")),
-                                Status = reader.GetString(reader.GetOrdinal("State")),
-                                UniqueCode = reader.GetString(reader.GetOrdinal("UniqueCode")),
-                                ProductsPrice = reader.GetDecimal(reader.GetOrdinal("ProductsPrice")),
-                                DeliveryPrice = reader.GetDecimal(reader.GetOrdinal("DeliveryPrice")),
-                                TotalPrice = reader.GetDecimal(reader.GetOrdinal("TotalPrice")),
-                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                                Phone = reader.GetString(reader.GetOrdinal("Phone")),
-                                Address = reader.GetString(reader.GetOrdinal("Address"))
+                            command.CommandText = "GetActiveOrdersSorted";
+                            command.CommandType = CommandType.StoredProcedure;
 
-                            };
-                            if (!reader.IsDBNull(reader.GetOrdinal("EstimatedDeliveryTime")))
+                            using (var reader = command.ExecuteReader())
                             {
-                                order.EstimatedDeliveryTime = reader.GetDateTime(reader.GetOrdinal("EstimatedDeliveryTime"));
+                                while (reader.Read())
+                                {
+                                    var order = new ActiveOrderViewModel
+                                    {
+                                        ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                                        DateAndTime = reader.GetDateTime(reader.GetOrdinal("DateAndTime")),
+                                        Status = reader.GetString(reader.GetOrdinal("State")),
+                                        UniqueCode = reader.GetString(reader.GetOrdinal("UniqueCode")),
+                                        ProductsPrice = reader.GetDecimal(reader.GetOrdinal("ProductsPrice")),
+                                        DeliveryPrice = reader.GetDecimal(reader.GetOrdinal("DeliveryPrice")),
+                                        TotalPrice = reader.GetDecimal(reader.GetOrdinal("TotalPrice")),
+                                        FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                        LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                        Phone = reader.GetString(reader.GetOrdinal("Phone")),
+                                        Address = reader.GetString(reader.GetOrdinal("Address"))
+                                    };
+
+                                    if (!reader.IsDBNull(reader.GetOrdinal("EstimatedDeliveryTime")))
+                                    {
+                                        order.EstimatedDeliveryTime = reader.GetDateTime(reader.GetOrdinal("EstimatedDeliveryTime"));
+                                    }
+
+                                    _activeOrders.Add(order);
+                                }
                             }
-                            _activeOrders.Add(order);
-
-                        }    
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading active orders: {ex.Message}", "Database Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void LoadLowStockProducts()
         {
             _lowStockProducts.Clear();
-            using(var conn = _context.Database.GetDbConnection())
+
+            try
             {
-                conn.Open();
-                using(var command = conn.CreateCommand())
+                // Create a new context specifically for this operation
+                using (var stockContext = new RestaurantContext())
                 {
-                    command.CommandText = "GetLowStockProducts";
-                    command.CommandType = CommandType.StoredProcedure;
-
-                    var param = command.CreateParameter();
-                    param.ParameterName = "@ThresholdQuantity";
-                    param.Value = _lowStockThreshold;
-                    command.Parameters.Add(param);
-
-                    using(var reader = command.ExecuteReader())
+                    if (stockContext.Database.CanConnect())
                     {
-                        while (reader.Read())
+                        using (var conn = stockContext.Database.GetDbConnection())
                         {
-                            _lowStockProducts.Add(new LowStockProductViewModel{
-                                Name = reader.GetString(reader.GetOrdinal("Name")),
-                                TotalQuantity = reader.GetDecimal(reader.GetOrdinal("TotalQuantity"))
-                            });
+                            conn.Open();
+                            using (var command = conn.CreateCommand())
+                            {
+                                command.CommandText = "GetLowStockProducts";
+                                command.CommandType = CommandType.StoredProcedure;
+
+                                var param = command.CreateParameter();
+                                param.ParameterName = "@ThresholdQuantity";
+                                param.Value = _lowStockThreshold;
+                                command.Parameters.Add(param);
+
+                                using (var reader = command.ExecuteReader())
+                                {
+                                    while (reader.Read())
+                                    {
+                                        _lowStockProducts.Add(new LowStockProductViewModel
+                                        {
+                                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                                            TotalQuantity = reader.GetDecimal(reader.GetOrdinal("TotalQuantity"))
+                                        });
+                                    }
+                                }
+                            }
                         }
                     }
+                    else
+                    {
+                        MessageBox.Show("Cannot connect to database. Please check your connection string.", "Database Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading low stock products: {ex.Message}", "Database Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -140,49 +183,50 @@ namespace Tema3_Restaurant
             var categoryWindow = new CategoryManagementWindow();
             categoryWindow.ShowDialog();
 
-            LoadActiveOrders();
-            LoadLowStockProducts();
+            // Reinitialize the context and reload data when returning from other windows
+            RefreshData();
         }
+
         private void BtnManageProducts_Click(object sender, RoutedEventArgs e)
         {
             var productWindow = new ProductManagementWindow();
             productWindow.ShowDialog();
 
-            LoadActiveOrders();
-            LoadLowStockProducts();
+            // Reinitialize the context and reload data when returning from other windows
+            RefreshData();
         }
-
 
         private void BtnManageMenus_Click(object sender, RoutedEventArgs e)
         {
             var menuWindow = new MenuManagementWindow();
             menuWindow.ShowDialog();
 
-            LoadActiveOrders();
-            LoadLowStockProducts();
+            // Reinitialize the context and reload data when returning from other windows
+            RefreshData();
         }
-
 
         private void BtnManageAllergens_Click(object sender, RoutedEventArgs e)
         {
             var allergenWindow = new AllergenManagementWindow();
             allergenWindow.ShowDialog();
 
-            LoadActiveOrders();
-            LoadLowStockProducts();
+            // Reinitialize the context and reload data when returning from other windows
+            RefreshData();
         }
-
 
         private void BtnViewAllOrders_Click(object sender, RoutedEventArgs e)
         {
             var allOrdersWindow = new AllOrdersWindow();
             allOrdersWindow.ShowDialog();
+
+            // Reinitialize the context and reload data when returning from other windows
+            RefreshData();
         }
 
         private void BtnViewOrderDetails_Click(object sender, RoutedEventArgs e)
         {
             var selectedOrder = LvActiveOrders.SelectedItem as ActiveOrderViewModel;
-            if(selectedOrder == null)
+            if (selectedOrder == null)
             {
                 MessageBox.Show("Please select an order to view details.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
@@ -190,6 +234,9 @@ namespace Tema3_Restaurant
 
             var orderDetailWindow = new OrderDetailWindow(selectedOrder.ID);
             orderDetailWindow.ShowDialog();
+
+            // Reinitialize the context and reload data when returning from other windows
+            RefreshData();
         }
 
         private void BtnUpdateOrderStatus_Click(object sender, RoutedEventArgs e)
@@ -205,20 +252,46 @@ namespace Tema3_Restaurant
             if (updateStatusWindow.ShowDialog() == true)
             {
                 // Refresh after status update
-                LoadActiveOrders();
+                RefreshData();
             }
         }
 
-        private void BtnRefresh_Click(object sedner, RoutedEventArgs e)
+        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            LoadActiveOrders();
-            LoadLowStockProducts();
+            RefreshData();
         }
+
+        // Common method to refresh all data
+        private void RefreshData()
+        {
+            try
+            {
+                // Reinitialize the context
+                InitializeContext();
+
+                // Reload all data
+                LoadConfiguration();
+                LoadActiveOrders();
+                LoadLowStockProducts();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error refreshing data: {ex.Message}", "Database Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void BtnLogout_Click(object sender, RoutedEventArgs e)
         {
             MainWindow window = new MainWindow();
             window.Show();
             this.Close();
+        }
+
+        // Override OnClosed to ensure proper disposal of resources
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            _context?.Dispose();
         }
     }
 }
