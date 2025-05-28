@@ -163,13 +163,13 @@ namespace Tema3_Restaurant.ViewModels
         {
             using (var context = new RestaurantContext())
             {
+
                 var products = context.Products
                     .Include(p => p.Category)
                     .Include(p => p.Images)
                     .Include(p => p.ProductAllergens)
                         .ThenInclude(pa => pa.Allergen)
-                    .Where(p => p.Available)
-                    .ToList();
+                    .ToList(); 
 
                 Products = new ObservableCollection<Product>(products);
 
@@ -182,11 +182,9 @@ namespace Tema3_Restaurant.ViewModels
                     .Include(m => m.MenuProducts)
                         .ThenInclude(mp => mp.Product)
                             .ThenInclude(p => p.Images)
-                    .Where(m => m.Available)
-                    .ToList();
-
-                Menus = new ObservableCollection<Menu>((IEnumerable<Menu>)menus);
-
+                    .ToList(); 
+             
+                Menus = new ObservableCollection<Menu>(menus);
             }
         }
 
@@ -200,17 +198,15 @@ namespace Tema3_Restaurant.ViewModels
 
             using (var context = new RestaurantContext())
             {
-
                 var products = context.Products
                     .Include(p => p.Category)
                     .Include(p => p.Images)
                     .Include(p => p.ProductAllergens)
                         .ThenInclude(pa => pa.Allergen)
-                    .Where(p => p.CategoryID == SelectedCategory.ID && p.Available)
+                    .Where(p => p.CategoryID == SelectedCategory.ID) 
                     .ToList();
 
                 Products = new ObservableCollection<Product>(products);
-
 
                 var menus = context.Menus
                     .Include(m => m.Category)
@@ -221,10 +217,10 @@ namespace Tema3_Restaurant.ViewModels
                     .Include(m => m.MenuProducts)
                         .ThenInclude(mp => mp.Product)
                             .ThenInclude(p => p.Images)
-                    .Where(m => m.CategoryID == SelectedCategory.ID && m.Available)
+                    .Where(m => m.CategoryID == SelectedCategory.ID) 
                     .ToList();
 
-                Menus = new ObservableCollection<Menu>((IEnumerable<Menu>)menus);
+                Menus = new ObservableCollection<Menu>(menus);
             }
         }
 
@@ -268,7 +264,7 @@ namespace Tema3_Restaurant.ViewModels
         {
             if (string.IsNullOrWhiteSpace(SearchKeyword))
             {
-                // Dacă nu există cuvânt cheie, revenim la afișarea normală
+                
                 IsSearchActive = false;
                 return;
             }
@@ -283,7 +279,6 @@ namespace Tema3_Restaurant.ViewModels
             }
             else
             {
-                // Folosim toate produsele și meniurile
                 using (var context = new RestaurantContext())
                 {
                     productsToSearch = context.Products
@@ -291,8 +286,7 @@ namespace Tema3_Restaurant.ViewModels
                         .Include(p => p.Images)
                         .Include(p => p.ProductAllergens)
                             .ThenInclude(pa => pa.Allergen)
-                        .Where(p => p.Available)
-                        .ToList();
+                        .ToList(); 
 
                     menusToSearch = context.Menus
                         .Include(m => m.Category)
@@ -303,28 +297,26 @@ namespace Tema3_Restaurant.ViewModels
                         .Include(m => m.MenuProducts)
                             .ThenInclude(mp => mp.Product)
                                 .ThenInclude(p => p.Images)
-                        .Where(m => m.Available)
-                        .ToList();
+                        .ToList(); 
                 }
             }
 
             var filteredItems = new List<object>();
             string keyword = SearchKeyword.ToLower().Trim();
 
-            // Filtrăm produsele
             foreach (var product in productsToSearch)
             {
                 bool matchesSearch = false;
 
                 if (SearchInName)
                 {
-                    // Căutare în numele produsului
+                    
                     bool containsKeyword = product.Name.ToLower().Contains(keyword);
                     matchesSearch = SearchContains ? containsKeyword : !containsKeyword;
                 }
                 else if (SearchInAllergens)
                 {
-                    // Căutare în alergenii produsului
+                    
                     bool containsAllergen = product.ProductAllergens != null &&
                                          product.ProductAllergens.Any(pa =>
                                              pa.Allergen.Name.ToLower().Contains(keyword));
@@ -337,20 +329,17 @@ namespace Tema3_Restaurant.ViewModels
                 }
             }
 
-            // Filtrăm meniurile
             foreach (var menu in menusToSearch)
             {
                 bool matchesSearch = false;
 
                 if (SearchInName)
-                {
-                    // Căutare în numele meniului
+                {           
                     bool containsKeyword = menu.Name.ToLower().Contains(keyword);
                     matchesSearch = SearchContains ? containsKeyword : !containsKeyword;
                 }
                 else if (SearchInAllergens)
                 {
-                    // Căutare în alergenii meniului (prin produsele meniului)
                     bool containsAllergen = false;
 
                     if (menu.MenuProducts != null)
@@ -376,7 +365,6 @@ namespace Tema3_Restaurant.ViewModels
                 }
             }
 
-            // Grupăm rezultatele după categorie
             var groupedItems = filteredItems
                 .GroupBy(item =>
                 {
@@ -389,10 +377,9 @@ namespace Tema3_Restaurant.ViewModels
                 .Where(g => g.Key != null)
                 .OrderBy(g => g.Key.Name);
 
-            // Actualizăm colecția pentru afișare
             GroupedSearchResults = new ObservableCollection<IGrouping<Category, object>>(groupedItems);
             IsSearchActive = true;
-        } 
+        }
 
         /// <summary>
         /// 
@@ -424,7 +411,6 @@ namespace Tema3_Restaurant.ViewModels
 
             GroupedSearchResults = new ObservableCollection<IGrouping<Category, object>>();
 
-            // Initialize commands
             AddToCartCommand = new RelayCommand2(AddToCart);
             DecreaseQuantityCommand = new RelayCommand2(DecreaseQuantity);
             IncreaseQuantityCommand = new RelayCommand2(IncreaseQuantity);
@@ -439,7 +425,6 @@ namespace Tema3_Restaurant.ViewModels
             CheckoutCommand = new RelayCommand2(param => SwitchToCartTab?.Invoke());
         }
 
-        // Properties
         public ObservableCollection<CartItem> CartItems
         {
             get => _cartItems;
@@ -514,13 +499,11 @@ namespace Tema3_Restaurant.ViewModels
             {
                 decimal discount = 0;
 
-                // Discount for order value
                 if (SubTotal >= _minOrderValueForDiscount)
                 {
                     discount = SubTotal * (_discountPercentage / 100);
                 }
 
-                // Discount for order frequency
                 DateTime timeWindow = DateTime.Now.AddDays(-_timeWindowForDiscountInDays);
                 int orderCount = _context.Orders
                     .Count(o => o.UserID == _currentUser.ID && o.DateAndTime >= timeWindow);
@@ -536,7 +519,6 @@ namespace Tema3_Restaurant.ViewModels
 
         public decimal OrderTotal => SubTotal + DeliveryFee - Discount;
 
-        // Commands
         public ICommand AddToCartCommand { get; private set; }
         public ICommand DecreaseQuantityCommand { get; private set; }
         public ICommand IncreaseQuantityCommand { get; private set; }
@@ -550,7 +532,6 @@ namespace Tema3_Restaurant.ViewModels
         public ICommand ViewCartCommand { get; private set; }
         public ICommand CheckoutCommand { get; private set; }
 
-        // Events
         public event PropertyChangedEventHandler PropertyChanged;
         public event Action SwitchToMenuTab;
         public event Action SwitchToCartTab;
@@ -572,7 +553,6 @@ namespace Tema3_Restaurant.ViewModels
             {
                 MessageBox.Show($"Error loading configuration settings: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
-                // Default values if configuration fails
                 _deliveryFee = 10;
                 _minOrderValueForFreeDelivery = 100;
                 _discountPercentage = 10;
@@ -614,18 +594,16 @@ namespace Tema3_Restaurant.ViewModels
 
                     if (!ShowAllOrders)
                     {
-                        // Filter active orders (not delivered or canceled)
                         query = query.Where(o => o.State != "Livrata" && o.State != "Anulata");
                     }
 
                     var orders = query.OrderByDescending(o => o.DateAndTime).ToList();
 
-                    // Load product names for each order item
                     foreach (var order in orders)
                     {
                         foreach (var item in order.Items)
                         {
-                            // Set ProductName based on item type
+  
                             if (item.ItemType == "Product")
                             {
                                 var product = context.Products.Find(item.ItemID);
@@ -644,11 +622,9 @@ namespace Tema3_Restaurant.ViewModels
                             }
                         }
 
-                        // Add can be cancelled flag
                         order.GetType().GetProperty("CanBeCancelled").SetValue(order,
                             order.State == "Inregistrata" || order.State == "Se pregateste");
 
-                        // Add HasEstimatedDeliveryTime flag
                         order.GetType().GetProperty("HasEstimatedDeliveryTime").SetValue(order,
                             order.EstimatedDeliveryTime.HasValue);
                     }
@@ -706,7 +682,7 @@ namespace Tema3_Restaurant.ViewModels
 
         private void DecreaseQuantity(object parameter)
         {
-            // This method is for the product/menu browsing page
+
             if (parameter is Product product)
             {
                 int currentQuantity = GetQuantity(product);
@@ -727,7 +703,7 @@ namespace Tema3_Restaurant.ViewModels
 
         private void IncreaseQuantity(object parameter)
         {
-            // This method is for the product/menu browsing page
+
             if (parameter is Product product)
             {
                 int currentQuantity = GetQuantity(product);
@@ -742,15 +718,11 @@ namespace Tema3_Restaurant.ViewModels
 
         private int GetQuantity(object item)
         {
-            // Placeholder for item quantity in the browsing page
-            // This could be expanded to track quantities in the UI
             return 0;
         }
 
         private void SetQuantity(object item, int quantity)
         {
-            // Placeholder for setting item quantity in the browsing page
-            // This could be expanded to track quantities in the UI
             if (quantity > 0)
             {
                 AddToCart(item);
@@ -814,12 +786,12 @@ namespace Tema3_Restaurant.ViewModels
 
                 using (var context = new RestaurantContext())
                 {
-                    // Begin transaction
+
                     using (var transaction = context.Database.BeginTransaction())
                     {
                         try
                         {
-                            // Create new order
+
                             var order = new Order
                             {
                                 UserID = _currentUser.ID,
@@ -833,7 +805,6 @@ namespace Tema3_Restaurant.ViewModels
                                 Items = new List<OrderItem>()
                             };
 
-                            // Add order items
                             foreach (var cartItem in CartItems)
                             {
                                 var orderItem = new OrderItem
@@ -846,39 +817,28 @@ namespace Tema3_Restaurant.ViewModels
 
                                 order.Items.Add(orderItem);
 
-                                // If order state is "Se pregateste", update product quantities
-                                if (order.State == "In Preparation")
-                                {
-                                    UpdateProductQuantities(context, cartItem);
-                                }
+                                UpdateProductQuantities(context, cartItem);
                             }
 
-                            // Set estimated delivery time (2 hours from now)
-                            order.EstimatedDeliveryTime = DateTime.Now.AddHours(2);
+                            order.EstimatedDeliveryTime = DateTime.Now.AddHours(1);
 
-                            // Add order to context
                             context.Orders.Add(order);
                             context.SaveChanges();
 
-                            // Commit transaction
                             transaction.Commit();
 
-                            // Clear cart
                             CartItems.Clear();
                             UpdateCartDependencies();
 
-                            // Reload orders
                             LoadUserOrders();
 
                             MessageBox.Show($"Order placed successfully! Your order code is: {order.UniqueCode}",
                                 "Order Placed", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                            // Switch to orders tab
                             SwitchToMenuTab?.Invoke();
                         }
                         catch (Exception ex)
                         {
-                            // Rollback transaction
                             transaction.Rollback();
                             throw new Exception($"Error placing order: {ex.Message}", ex);
                         }
@@ -893,7 +853,6 @@ namespace Tema3_Restaurant.ViewModels
 
         private string GenerateUniqueCode()
         {
-            // Generate a unique code for the order (combine date and random number)
             string dateString = DateTime.Now.ToString("yyyyMMddHHmmss");
             string randomString = new Random().Next(1000, 9999).ToString();
             return $"ORD-{dateString}-{randomString}";
@@ -906,16 +865,15 @@ namespace Tema3_Restaurant.ViewModels
                 var product = context.Products.Find(cartItem.ItemID);
                 if (product != null)
                 {
-                    // Decrease total quantity by portion quantity * number of items
                     decimal quantityToDeduct = product.PortionQuantity * cartItem.Quantity;
                     product.TotalQuantity -= quantityToDeduct;
 
-                    // If total quantity is less than 0, set to 0
                     if (product.TotalQuantity < 0)
                         product.TotalQuantity = 0;
 
-                    // If total quantity is less than portion quantity, mark as unavailable
                     product.Available = product.TotalQuantity >= product.PortionQuantity;
+
+                    context.Entry(product).State = EntityState.Modified;
                 }
             }
             else if (cartItem.ItemType == "Menu")
@@ -929,16 +887,16 @@ namespace Tema3_Restaurant.ViewModels
                 {
                     foreach (var menuProduct in menu.MenuProducts)
                     {
-                        // Decrease product quantity by the menu item quantity * number of menu items
+
                         decimal quantityToDeduct = menuProduct.Quantity * cartItem.Quantity;
                         menuProduct.Product.TotalQuantity -= quantityToDeduct;
 
-                        // If total quantity is less than 0, set to 0
                         if (menuProduct.Product.TotalQuantity < 0)
                             menuProduct.Product.TotalQuantity = 0;
 
-                        // If total quantity is less than portion quantity, mark as unavailable
                         menuProduct.Product.Available = menuProduct.Product.TotalQuantity >= menuProduct.Product.PortionQuantity;
+
+                        context.Entry(menuProduct.Product).State = EntityState.Modified;
                     }
                 }
             }
@@ -949,7 +907,6 @@ namespace Tema3_Restaurant.ViewModels
         {
             if (parameter is Order order)
             {
-                // Only allow cancellation of orders that are registered or being prepared
                 if (order.State != "Inregistrata" && order.State != "Se pregateste")
                 {
                     MessageBox.Show("This order cannot be cancelled.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -965,17 +922,39 @@ namespace Tema3_Restaurant.ViewModels
                     {
                         using (var context = new RestaurantContext())
                         {
-                            var dbOrder = context.Orders.Find(order.ID);
-                            if (dbOrder != null)
+                            using (var transaction = context.Database.BeginTransaction())
                             {
-                                dbOrder.State = "Anulata";
-                                context.SaveChanges();
+                                try
+                                {
 
-                                // Refresh orders
-                                LoadUserOrders();
+                                    var dbOrder = context.Orders
+                                        .Include(o => o.Items)
+                                        .FirstOrDefault(o => o.ID == order.ID);
 
-                                MessageBox.Show("Order cancelled successfully.", "Order Cancelled",
-                                    MessageBoxButton.OK, MessageBoxImage.Information);
+                                    if (dbOrder != null)
+                                    {
+
+                                        RestoreProductQuantities(context, dbOrder);
+
+                                        dbOrder.State = "Anulata";
+
+                                        context.SaveChanges();
+
+                                        transaction.Commit();
+
+                                        LoadUserOrders();
+
+                                        LoadProductsAndMenusByCategory();
+
+                                        MessageBox.Show("Order cancelled successfully and stock has been restored.",
+                                            "Order Cancelled", MessageBoxButton.OK, MessageBoxImage.Information);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    transaction.Rollback();
+                                    throw new Exception($"Error cancelling order: {ex.Message}", ex);
+                                }
                             }
                         }
                     }
@@ -983,6 +962,49 @@ namespace Tema3_Restaurant.ViewModels
                     {
                         MessageBox.Show($"Failed to cancel order: {ex.Message}", "Error",
                             MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+        }
+
+        private void RestoreProductQuantities(RestaurantContext context, Order order)
+        {
+            foreach (var orderItem in order.Items)
+            {
+                if (orderItem.ItemType == "Product")
+                {
+                    var product = context.Products.Find(orderItem.ItemID);
+                    if (product != null)
+                    {
+                        
+                        decimal quantityToRestore = product.PortionQuantity * orderItem.Quantity;
+                        product.TotalQuantity += quantityToRestore;
+
+                        
+                        product.Available = product.TotalQuantity >= product.PortionQuantity;
+
+                        
+                        context.Entry(product).State = EntityState.Modified;
+                    }
+                }
+                else if (orderItem.ItemType == "Menu")
+                {
+                    var menu = context.Menus
+                        .Include(m => m.MenuProducts)
+                        .ThenInclude(mp => mp.Product)
+                        .FirstOrDefault(m => m.ID == orderItem.ItemID);
+
+                    if (menu != null)
+                    {
+                        foreach (var menuProduct in menu.MenuProducts)
+                        {
+                            decimal quantityToRestore = menuProduct.Quantity * orderItem.Quantity;
+                            menuProduct.Product.TotalQuantity += quantityToRestore;
+
+                            menuProduct.Product.Available = menuProduct.Product.TotalQuantity >= menuProduct.Product.PortionQuantity;
+
+                            context.Entry(menuProduct.Product).State = EntityState.Modified;
+                        }
                     }
                 }
             }

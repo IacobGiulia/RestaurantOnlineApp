@@ -96,10 +96,15 @@
                                                                     <Image Source="{Binding FirstImagePath}" Stretch="Uniform"/>
                                                                 </Border>
                                                                 <StackPanel Grid.Column="1">
-                                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
+                                                                    <StackPanel Orientation="Horizontal">
+                                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
+                                                                        <TextBlock Text=" (indisponibil)" Foreground="Red" FontWeight="Bold" FontSize="14" 
+                                                                                   Visibility="{Binding IsAvailable, Converter={StaticResource InverseBoolToVisibilityConverter}}" 
+                                                                                   VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                                                    </StackPanel>
                                                                     <TextBlock Text="{Binding Category.Name}" FontStyle="Italic" Margin="0,5,0,5"/>
 
-                                                                    <!-- Display portion quantity for products -->
+                                                                    
                                                                     <TextBlock Visibility="{Binding Path=., 
                                                                         Converter={StaticResource ProductTypeToVisibilityConverter}}">
                                                                         <Run Text="Portion: "/>
@@ -116,10 +121,14 @@
                                                                                         <Grid.ColumnDefinitions>
                                                                                             <ColumnDefinition Width="*"/>
                                                                                             <ColumnDefinition Width="Auto"/>
+                                                                                            <ColumnDefinition Width="Auto"/>
                                                                                         </Grid.ColumnDefinitions>
                                                                                         <TextBlock Grid.Column="0" Text="{Binding Product.Name}"/>
                                                                                         <TextBlock Grid.Column="1" Text="{Binding Quantity, StringFormat='{}{0}g'}" 
                                                                                                 Margin="10,0,0,0"/>
+                                                                                        <TextBlock Grid.Column="2" Text=" (indisponibil)" Foreground="Red" 
+                                                                                                   Visibility="{Binding Product.IsAvailable, Converter={StaticResource InverseBoolToVisibilityConverter}}" 
+                                                                                                   Margin="5,0,0,0"/>
                                                                                     </Grid>
                                                                                 </DataTemplate>
                                                                             </ItemsControl.ItemTemplate>
@@ -156,13 +165,13 @@
                                                                 <StackPanel Grid.Column="3" VerticalAlignment="Center" Margin="10,0,0,0">
                                                                     <StackPanel Orientation="Horizontal">
                                                                         <Button Content="-" Command="{Binding DataContext.DecreaseQuantityCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
-                                                                                CommandParameter="{Binding}" Width="25" Height="25" Margin="0,0,5,0"/>
+                                                                                CommandParameter="{Binding}" Width="25" Height="25" Margin="0,0,5,0" IsEnabled="{Binding IsAvailable}"/>
                                                                         <TextBlock Text="{Binding Quantity}" VerticalAlignment="Center" MinWidth="20" TextAlignment="Center"/>
                                                                         <Button Content="+" Command="{Binding DataContext.IncreaseQuantityCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
-                                                                                CommandParameter="{Binding}" Width="25" Height="25" Margin="5,0,0,0"/>
+                                                                                CommandParameter="{Binding}" Width="25" Height="25" Margin="5,0,0,0" IsEnabled="{Binding IsAvailable}"/>
                                                                     </StackPanel>
                                                                     <Button Content="Add to Cart" Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
-                                                                            CommandParameter="{Binding}" Margin="0,5,0,0" Padding="5,2"/>
+                                                                            CommandParameter="{Binding}" Margin="0,5,0,0" Padding="5,2" IsEnabled="{Binding IsAvailable}"/>
                                                                 </StackPanel>
 
                                                             </Grid>
@@ -194,9 +203,16 @@
                                                 </Border>
 
                                                 <StackPanel Grid.Column="1">
-                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
+                                                        <TextBlock Text=" (indisponibil)" Foreground="Red" FontWeight="Bold" FontSize="14" 
+         Visibility="{Binding IsAvailable, Converter={StaticResource InverseBoolToVisibilityConverter}}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                                    </StackPanel>
+                                                    
                                                     <TextBlock Text="{Binding Category.Name}" FontStyle="Italic" Margin="0,5,0,5"/>
-                                                    <TextBlock>
+
+
+                                                    <TextBlock Visibility="{Binding Path=., Converter={StaticResource ProductTypeToVisibilityConverter}}">
                                                         <Run Text="Portion: "/>
                                                         <Run Text="{Binding PortionQuantity, StringFormat='{}{0}g'}"/>
                                                     </TextBlock>
@@ -223,13 +239,13 @@
                                                 <StackPanel Grid.Column="3" VerticalAlignment="center" Margin="10,0,0,0">
                                                     <StackPanel Orientation="Horizontal">
                                                         <Button Content="-" Command="{Binding DataContext.DecreaseQuantityCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
-                                                                CommandParameter="{Binding}" Width="25" Height="25" Margin="0,0,5,0"/>
+                                                                CommandParameter="{Binding}" Width="25" Height="25" Margin="0,0,5,0" IsEnabled="{Binding IsAvailable}"/>
                                                         <TextBlock Text="{Binding Quantity}" VerticalAlignment="Center" MinWidth="20" TextAlignment="Center"/>
                                                         <Button Content="+" Command="{Binding DataContext.IncreaseQuantityCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
-                                                                CommandParameter="{Binding}" Width="25" Height="25" Margin="5,0,0,0"/>
+                                                                CommandParameter="{Binding}" Width="25" Height="25" Margin="5,0,0,0" IsEnabled="{Binding IsAvailable}"/>
                                                     </StackPanel>
                                                     <Button Content="Add to Cart" Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
-                                                            CommandParameter="{Binding}" Margin="0,5,0,0" Padding="5,2"/>
+                                                            CommandParameter="{Binding}" Margin="0,5,0,0" Padding="5,2" IsEnabled="{Binding IsAvailable}"/>
                                                 </StackPanel>
                                             </Grid>
                                         </Border>
@@ -250,7 +266,13 @@
                                                 </Grid.ColumnDefinitions>
 
                                                 <StackPanel Grid.Column="0">
-                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
+                                                        <TextBlock Text=" (indisponibil)" Foreground="Red" FontWeight="Bold" FontSize="14" 
+                                                                   Visibility="{Binding IsAvailable, Converter={StaticResource InverseBoolToVisibilityConverter}}" 
+                                                                   VerticalAlignment="Center" Margin="5,0,0,0"/>
+                                                    </StackPanel>
+                                                       
                                                     <TextBlock Text="{Binding Category.Name}" FontStyle="Italic" Margin="0,5,0,5"/>
                                                     <TextBlock Text="Contents:" FontWeight="SemiBold" Margin="0,5,0,5"/>
                                                     <ItemsControl ItemsSource="{Binding MenuProducts}">
@@ -260,9 +282,11 @@
                                                                     <Grid.ColumnDefinitions>
                                                                         <ColumnDefinition Width="*"/>
                                                                         <ColumnDefinition Width="Auto"/>
+                                                                        <ColumnDefinition Width="Auto"/>
                                                                     </Grid.ColumnDefinitions>
                                                                     <TextBlock Grid.Column="0" Text="{Binding Product.Name}"/>
                                                                     <TextBlock Grid.Column="1" Text="{Binding Quantity, StringFormat='{}{0}g'}" Margin="10,0,0,0"/>
+                                                                    <TextBlock Grid.Column="2" Text=" (indisponibil)" Foreground="Red"  Visibility="{Binding Product.IsAvailable, Converter={StaticResource InverseBoolToVisibilityConverter}}" Margin="5,0,0,0"/>
                                                                 </Grid>
                                                             </DataTemplate>
                                                         </ItemsControl.ItemTemplate>
@@ -291,13 +315,13 @@
                                                 <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0">
                                                     <StackPanel Orientation="Horizontal">
                                                         <Button Content="-" Command="{Binding DataContext.DecreaseQuantityCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
-                                                                CommandParameter="{Binding}" Width="25" Height="25" Margin="0,0,5,0"/>
+                                                                CommandParameter="{Binding}" Width="25" Height="25" Margin="0,0,5,0" IsEnabled="{Binding IsAvailable}"/>
                                                         <TextBlock Text="{Binding Quantity}" VerticalAlignment="Center" MinWidth="20" TextAlignment="Center"/>
                                                         <Button Content="+" Command="{Binding DataContext.IncreaseQuantityCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
-                                                                CommandParameter="{Binding}" Width="25" Height="25" Margin="5,0,0,0"/>
+                                                                CommandParameter="{Binding}" Width="25" Height="25" Margin="5,0,0,0" IsEnabled="{Binding IsAvailable}"/>
                                                     </StackPanel>
                                                     <Button Content="Add to Cart" Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" 
-                                                            CommandParameter="{Binding}" Margin="0,5,0,0" Padding="5,2"/>
+                                                            CommandParameter="{Binding}" Margin="0,5,0,0" Padding="5,2" IsEnabled="{Binding IsAvailable}"/>
                                                 </StackPanel>
 
                                             </Grid>
@@ -344,7 +368,7 @@
                         <StackPanel Margin="10">
                             <TextBlock Text="Your Cart" FontSize="22" FontWeight="Bold" Margin="0,0,0,15"/>
 
-                            <!-- Empty Cart Message -->
+                            
                             <TextBlock Text="Your cart is empty" 
                                        Visibility="{Binding HasItemsInCart, Converter={StaticResource InverseBoolToVisibilityConverter}}"
                                        FontSize="16" HorizontalAlignment="Center" Margin="0,20"/>
@@ -416,18 +440,18 @@
                                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Subtotal:" Margin="0,5"/>
                                     <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SubTotal, StringFormat='{}{0:C}'}" Margin="0,5" HorizontalAlignment="Right"/>
 
-                                    <!-- Delivery Fee -->
+                                    
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Delivery Fee:" Margin="0,5"/>
                                     <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DeliveryFee, StringFormat='{}{0:C}'}" Margin="0,5" HorizontalAlignment="Right"/>
 
-                                    <!-- Discount -->
+                                    
                                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Discount:" Margin="0,5"/>
                                     <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Discount, StringFormat='-{0:C}'}" Margin="0,5" HorizontalAlignment="Right" Foreground="Green"/>
 
-                                    <!-- Separator -->
+                                    
                                     <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="LightGray" BorderThickness="0,1,0,0" Margin="0,5"/>
 
-                                    <!-- Total -->
+                                    
                                     <TextBlock Grid.Row="4" Grid.Column="0" Text="Total:" FontWeight="Bold" FontSize="16" Margin="0,5"/>
                                     <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding OrderTotal, StringFormat='{}{0:C}'}" FontWeight="Bold" FontSize="16" Margin="0,5" HorizontalAlignment="Right"/>
                                     
@@ -488,16 +512,16 @@
 
                                                     <TextBlock Grid.Column="0" Text="{Binding DateAndTime, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" VerticalAlignment="Center"/>
 
-                                                    <!-- Order Code -->
+                                                    
                                                     <TextBlock Grid.Column="1" Text="{Binding UniqueCode}" FontWeight="SemiBold" Margin="15,0" VerticalAlignment="Center"/>
 
-                                                    <!-- Order Status -->
+                                                    
                                                     <Border Grid.Column="2" Background="{Binding State, Converter={StaticResource OrderStateToColorConverter}}" 
                                                             CornerRadius="4" Padding="8,4" Margin="0,0,15,0">
                                                         <TextBlock Text="{Binding State}" Foreground="White" FontWeight="SemiBold"/>
                                                     </Border>
 
-                                                    <!-- Order Total -->
+                                                    
                                                     <TextBlock Grid.Column="3" Text="{Binding TotalPrice, StringFormat='{}{0:C}'}" FontWeight="Bold" VerticalAlignment="Center"/>
                                                 </Grid>
                                             </Expander.Header>
@@ -544,15 +568,15 @@
                                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Products Price:" Margin="0,2"/>
                                                         <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ProductsPrice, StringFormat='{}{0:C}'}" Margin="0,2" HorizontalAlignment="Right"/>
 
-                                                        <!-- Delivery Fee -->
+                                                        
                                                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Delivery Fee:" Margin="0,2"/>
                                                         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding DeliveryPrice, StringFormat='{}{0:C}'}" Margin="0,2" HorizontalAlignment="Right"/>
 
-                                                        <!-- Discount -->
+                                                        
                                                         <TextBlock Grid.Row="2" Grid.Column="0" Text="Discount:" Margin="0,2"/>
                                                         <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Discount, StringFormat='-{0:C}'}" Margin="0,2" HorizontalAlignment="Right" Foreground="Green"/>
 
-                                                        <!-- Total -->
+                                                        
                                                         <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="LightGray" BorderThickness="0,1,0,0" Margin="0,5,0,5"/>
                                                         <TextBlock Grid.Row="3" Grid.Column="0" Text="Total:" FontWeight="Bold" Margin="0,5,0,0"/>
                                                         <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding TotalPrice, StringFormat='{}{0:C}'}" FontWeight="Bold" Margin="0,5,0,0" HorizontalAlignment="Right"/>

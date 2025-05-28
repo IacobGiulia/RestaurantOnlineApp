@@ -48,7 +48,6 @@ namespace Tema3_Restaurant
         {
             try
             {
-                // Get order with user information
                 _order = _context.Orders
                     .Where(o => o.ID == _orderId)
                     .Select(o => new Order
@@ -82,7 +81,6 @@ namespace Tema3_Restaurant
                     return;
                 }
 
-                // Populate the UI with order details
                 TxtOrderDate.Text = _order.DateAndTime.ToString("dd/MM/yyyy HH:mm");
                 TxtOrderCode.Text = _order.UniqueCode;
                 TxtOrderStatus.Text = _order.State;
@@ -121,7 +119,6 @@ namespace Tema3_Restaurant
                         command.CommandText = "GetOrderDetails";
                         command.CommandType = CommandType.StoredProcedure;
 
-                        // Add parameter
                         var param = command.CreateParameter();
                         param.ParameterName = "@OrderID";
                         param.Value = _orderId;
@@ -154,7 +151,7 @@ namespace Tema3_Restaurant
 
         private void BtnUpdateStatus_Click(object sender, RoutedEventArgs e)
         {
-            // Skip if order is completed or canceled
+            
             if (_order.State == "Delivered" || _order.State == "Canceled")
             {
                 MessageBox.Show("Cannot update status for delivered or canceled orders.",
@@ -162,7 +159,7 @@ namespace Tema3_Restaurant
                 return;
             }
 
-            // Create view model for the order (used by update status window)
+            
             var orderVM = new ActiveOrderViewModel
             {
                 ID = _order.ID,
@@ -182,7 +179,7 @@ namespace Tema3_Restaurant
             var updateStatusWindow = new UpdateOrderStatusWindow(orderVM);
             if (updateStatusWindow.ShowDialog() == true)
             {
-                // Refresh order details after status update
+                
                 LoadOrderDetails();
             }
         }

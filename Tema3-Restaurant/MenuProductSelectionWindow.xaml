@@ -13,10 +13,8 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Header -->
         <TextBlock Text="Select Products for Menu" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,15" Grid.Row="0"/>
 
-        <!-- Main Content -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -24,7 +22,6 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Available Products List -->
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -44,14 +41,12 @@
                 </ListView>
             </Grid>
 
-            <!-- Action Buttons -->
             <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="15,0">
                 <Button x:Name="BtnAddToMenu" Content="Add &gt;&gt;" Width="80" Height="30" Margin="0,5" Click="BtnAddToMenu_Click"/>
                 <Button x:Name="BtnRemoveFromMenu" Content="&lt;&lt; Remove" Width="80" Height="30" Margin="0,5" Click="BtnRemoveFromMenu_Click"/>
                 <Button x:Name="BtnUpdateQuantity" Content="Update Qty" Width="80" Height="30" Margin="0,20,0,5" Click="BtnUpdateQuantity_Click"/>
             </StackPanel>
 
-            <!-- Selected Products List -->
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -72,7 +67,6 @@
             </Grid>
         </Grid>
 
-        <!-- Bottom Buttons -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="2" Margin="0,15,0,0">
             <Button x:Name="BtnCancel" Content="Cancel" Width="80" Height="30" Margin="0,0,10,0" Click="BtnCancel_Click"/>
             <Button x:Name="BtnDone" Content="Done" Width="80" Height="30" Background="#3498db" Foreground="White" Click="BtnDone_Click"/>

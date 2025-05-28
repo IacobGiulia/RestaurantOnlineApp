@@ -50,10 +50,10 @@
                 Margin="10,5,0,5" SelectedDateChanged="DpEstimatedDeliveryDate_SelectedDateChanged"/>
         <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Margin="10,5,0,5">
             <TextBox x:Name="TxtEstimatedDeliveryHour" Width="40" MaxLength="2" 
-                 PreviewTextInput="NumberValidationTextBox" Text="00"/>
+                 PreviewTextInput="NumberValidationTextBox" Text="00" Height="19"/>
             <TextBlock Text=":" Margin="5,0"/>
             <TextBox x:Name="TxtEstimatedDeliveryMinute" Width="40" MaxLength="2" 
-                 PreviewTextInput="NumberValidationTextBox" Text="00"/>
+                 PreviewTextInput="NumberValidationTextBox" Text="00" Height="19"/>
         </StackPanel>
 
         <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" 

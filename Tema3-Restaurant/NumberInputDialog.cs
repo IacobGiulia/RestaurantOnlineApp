@@ -29,7 +29,6 @@ namespace Tema3_Restaurant
             grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
-            // Prompt label
             TextBlock lblPrompt = new TextBlock
             {
                 Text = prompt,
@@ -38,7 +37,6 @@ namespace Tema3_Restaurant
             Grid.SetRow(lblPrompt, 0);
             grid.Children.Add(lblPrompt);
 
-            // Value textbox
             txtValue = new TextBox
             {
                 Text = defaultValue.ToString(),
@@ -47,7 +45,6 @@ namespace Tema3_Restaurant
             Grid.SetRow(txtValue, 1);
             grid.Children.Add(txtValue);
 
-            // Buttons
             StackPanel buttons = new StackPanel
             {
                 Orientation = Orientation.Horizontal,

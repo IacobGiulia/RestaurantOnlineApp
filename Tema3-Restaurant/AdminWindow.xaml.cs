@@ -33,7 +33,6 @@ namespace Tema3_Restaurant
 
             TxtEmployeeName.Text = $"Welcome, {_currentUser.FirstName} {_currentUser.LastName}";
 
-            // Initialize the database context
             InitializeContext();
 
             try
@@ -51,13 +50,10 @@ namespace Tema3_Restaurant
             LvLowStockProducts.ItemsSource = _lowStockProducts;
         }
 
-        // Separate method to initialize or reinitialize the context
         private void InitializeContext()
         {
-            // Dispose the old context if it exists
             _context?.Dispose();
 
-            // Create a new context
             _context = new RestaurantContext();
         }
 
@@ -80,7 +76,6 @@ namespace Tema3_Restaurant
 
             try
             {
-                // Create a new context specifically for this operation
                 using (var orderContext = new RestaurantContext())
                 {
                     using (var conn = orderContext.Database.GetDbConnection())
@@ -134,7 +129,6 @@ namespace Tema3_Restaurant
 
             try
             {
-                // Create a new context specifically for this operation
                 using (var stockContext = new RestaurantContext())
                 {
                     if (stockContext.Database.CanConnect())
@@ -183,7 +177,6 @@ namespace Tema3_Restaurant
             var categoryWindow = new CategoryManagementWindow();
             categoryWindow.ShowDialog();
 
-            // Reinitialize the context and reload data when returning from other windows
             RefreshData();
         }
 
@@ -192,7 +185,6 @@ namespace Tema3_Restaurant
             var productWindow = new ProductManagementWindow();
             productWindow.ShowDialog();
 
-            // Reinitialize the context and reload data when returning from other windows
             RefreshData();
         }
 
@@ -201,7 +193,6 @@ namespace Tema3_Restaurant
             var menuWindow = new MenuManagementWindow();
             menuWindow.ShowDialog();
 
-            // Reinitialize the context and reload data when returning from other windows
             RefreshData();
         }
 
@@ -210,7 +201,6 @@ namespace Tema3_Restaurant
             var allergenWindow = new AllergenManagementWindow();
             allergenWindow.ShowDialog();
 
-            // Reinitialize the context and reload data when returning from other windows
             RefreshData();
         }
 
@@ -219,7 +209,6 @@ namespace Tema3_Restaurant
             var allOrdersWindow = new AllOrdersWindow();
             allOrdersWindow.ShowDialog();
 
-            // Reinitialize the context and reload data when returning from other windows
             RefreshData();
         }
 
@@ -235,7 +224,6 @@ namespace Tema3_Restaurant
             var orderDetailWindow = new OrderDetailWindow(selectedOrder.ID);
             orderDetailWindow.ShowDialog();
 
-            // Reinitialize the context and reload data when returning from other windows
             RefreshData();
         }
 
@@ -251,7 +239,6 @@ namespace Tema3_Restaurant
             var updateStatusWindow = new UpdateOrderStatusWindow(selectedOrder);
             if (updateStatusWindow.ShowDialog() == true)
             {
-                // Refresh after status update
                 RefreshData();
             }
         }
@@ -261,15 +248,13 @@ namespace Tema3_Restaurant
             RefreshData();
         }
 
-        // Common method to refresh all data
         private void RefreshData()
         {
             try
             {
-                // Reinitialize the context
+                
                 InitializeContext();
 
-                // Reload all data
                 LoadConfiguration();
                 LoadActiveOrders();
                 LoadLowStockProducts();
@@ -287,7 +272,6 @@ namespace Tema3_Restaurant
             this.Close();
         }
 
-        // Override OnClosed to ensure proper disposal of resources
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);

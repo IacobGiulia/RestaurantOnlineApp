@@ -81,7 +81,6 @@ namespace Tema3_Restaurant
                     totalPrice += mp.Product.Price * (mp.Quantity / mp.Product.PortionQuantity);
                 }
 
-                // Apply menu discount if configured
                 var configuration = _context.ConfigurationApp
                     .FirstOrDefault(c => c.Key == "ProcentReducereMeniu");
 
@@ -139,11 +138,9 @@ namespace Tema3_Restaurant
             {
                 try
                 {
-                    // Remove all menu products first
                     var menuProductsToRemove = _context.MenuProducts.Where(mp => mp.MenuID == _currentMenu.ID).ToList();
                     _context.MenuProducts.RemoveRange(menuProductsToRemove);
 
-                    // Remove the menu
                     _context.Menus.Remove(_currentMenu);
                     _context.SaveChanges();
 
@@ -172,7 +169,6 @@ namespace Tema3_Restaurant
                 _currentMenu.Name = TxtMenuName.Text;
             }
 
-            // Save the menu first if it's new
             if (_isNewMenu && string.IsNullOrWhiteSpace(_currentMenu.Name))
             {
                 MessageBox.Show("Please enter a menu name before adding products.", "Missing Information",
@@ -183,10 +179,8 @@ namespace Tema3_Restaurant
             var productSelectionWindow = new MenuProductSelectionWindow(_menuProducts);
             if (productSelectionWindow.ShowDialog() == true)
             {
-                // Clear existing menu products
                 _menuProducts.Clear();
 
-                // Add all selected products
                 foreach (var mp in productSelectionWindow.SelectedProducts)
                 {
                     _menuProducts.Add(mp);
@@ -223,7 +217,6 @@ namespace Tema3_Restaurant
             {
                 if (_isNewMenu)
                 {
-                    // Create a new menu
                     _currentMenu = new Tema3_Restaurant.Models.Menu
                     {
                         Name = TxtMenuName.Text,
@@ -232,12 +225,12 @@ namespace Tema3_Restaurant
                     };
 
                     _context.Menus.Add(_currentMenu);
-                    _context.SaveChanges(); // Salvăm mai întâi meniul pentru a obține ID-ul
+                    _context.SaveChanges(); 
 
-                    // Add menu products
+
                     foreach (var mp in _menuProducts)
                     {
-                        // Creăm instanțe noi de MenuProduct pentru a evita probleme de tracking
+
                         var newMenuProduct = new MenuProduct
                         {
                             MenuID = _currentMenu.ID,
@@ -252,21 +245,18 @@ namespace Tema3_Restaurant
                 }
                 else
                 {
-                    // Update existing menu
                     _currentMenu.Name = TxtMenuName.Text;
                     _currentMenu.CategoryID = ((Category)CmbCategory.SelectedItem).ID;
                     _currentMenu.Available = ChkAvailable.IsChecked ?? true;
-                    _context.SaveChanges(); // Salvăm modificările la meniu
+                    _context.SaveChanges(); 
 
-                    // Remove all existing menu products
                     var existingProducts = _context.MenuProducts.Where(mp => mp.MenuID == _currentMenu.ID).ToList();
                     _context.MenuProducts.RemoveRange(existingProducts);
-                    _context.SaveChanges(); // Salvăm ștergerea produselor vechi
+                    _context.SaveChanges(); 
 
-                    // Add updated menu products
                     foreach (var mp in _menuProducts)
                     {
-                        // Creăm instanțe noi de MenuProduct pentru a evita probleme de tracking
+
                         var newMenuProduct = new MenuProduct
                         {
                             MenuID = _currentMenu.ID,
@@ -285,7 +275,7 @@ namespace Tema3_Restaurant
             }
             catch (Exception ex)
             {
-                // Afișăm mesajul de eroare intern pentru diagnosticare
+
                 string errorMessage = ex.Message;
                 if (ex.InnerException != null)
                 {

@@ -156,14 +156,13 @@ namespace Tema3_Restaurant
                 return;
             }
 
-            // Check if product already exists
+            
             if (_context.Products.Any(p => p.Name == TxtProductName.Text))
             {
                 MessageBox.Show("A product with this name already exists.", "Duplicate Entry", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            // Create new product
             var newProduct = new Product
             {
                 Name = TxtProductName.Text,
@@ -204,7 +203,6 @@ namespace Tema3_Restaurant
 
             _context.SaveChanges();
 
-            // Refresh list and clear form
             LoadProducts();
             ClearForm();
 
@@ -219,7 +217,6 @@ namespace Tema3_Restaurant
                 return;
             }
 
-            // Validate input
             if (string.IsNullOrWhiteSpace(TxtProductName.Text))
             {
                 MessageBox.Show("Please enter a product name.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -250,14 +247,12 @@ namespace Tema3_Restaurant
                 return;
             }
 
-            // Check if new name would create a duplicate (except for the current product)
             if (_context.Products.Any(p => p.Name == TxtProductName.Text && p.ID != selectedProductVM.ID))
             {
                 MessageBox.Show("A product with this name already exists.", "Duplicate Entry", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            // Get existing product from database
             var product = _context.Products.Find(selectedProductVM.ID);
             if (product == null)
             {
@@ -265,7 +260,6 @@ namespace Tema3_Restaurant
                 return;
             }
 
-            // Update product
             product.Name = TxtProductName.Text;
             product.Price = price;
             product.PortionQuantity = portionQuantity;
@@ -276,26 +270,21 @@ namespace Tema3_Restaurant
             _context.Entry(product).State = EntityState.Modified;
             _context.SaveChanges();
 
-            // Update product image if a new one was selected
             if (!string.IsNullOrEmpty(_imagePath))
             {
                 string fileName = Path.GetFileName(_imagePath);
                 string targetPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images", "Products", fileName);
 
-                // Ensure directory exists
                 Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images", "Products"));
 
-                // Copy file to target directory
                 File.Copy(_imagePath, targetPath, true);
 
-                // Remove existing images
                 var existingImages = _context.ProductImages.Where(pi => pi.ProductID == product.ID).ToList();
                 foreach (var img in existingImages)
                 {
                     _context.ProductImages.Remove(img);
                 }
 
-                // Add new image
                 var productImage = new ProductImage
                 {
                     ProductID = product.ID,
@@ -306,15 +295,12 @@ namespace Tema3_Restaurant
                 _context.SaveChanges();
             }
 
-            // Update allergens
-            // First, remove all existing allergens
             var existingAllergens = _context.ProductAllergens.Where(pa => pa.ProductID == product.ID).ToList();
             foreach (var pa in existingAllergens)
             {
                 _context.ProductAllergens.Remove(pa);
             }
 
-            // Then add selected allergens
             foreach (var allergen in _selectedAllergens)
             {
                 var productAllergen = new ProductAllergen
@@ -328,7 +314,6 @@ namespace Tema3_Restaurant
 
             _context.SaveChanges();
 
-            // Refresh list and clear form
             LoadProducts();
             ClearForm();
         }
@@ -342,7 +327,6 @@ namespace Tema3_Restaurant
                 return;
             }
 
-            // Check if product is used in any menus
             bool isUsedInMenu = _context.MenuProducts.Any(mp => mp.ProductID == selectedProductVM.ID);
             if (isUsedInMenu)
             {
@@ -351,13 +335,11 @@ namespace Tema3_Restaurant
                 return;
             }
 
-            // Confirm deletion
             var result = MessageBox.Show($"Are you sure you want to delete the product '{selectedProductVM.Name}'?",
                 "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)
             {
-                // Get the product and related entities
                 var product = _context.Products
                     .Include(p => p.Images)
                     .Include(p => p.ProductAllergens)
@@ -365,23 +347,19 @@ namespace Tema3_Restaurant
 
                 if (product != null)
                 {
-                    // Remove product allergens
                     foreach (var pa in product.ProductAllergens.ToList())
                     {
                         _context.ProductAllergens.Remove(pa);
                     }
 
-                    // Remove product images
                     foreach (var img in product.Images.ToList())
                     {
                         _context.ProductImages.Remove(img);
                     }
 
-                    // Remove product
                     _context.Products.Remove(product);
                     _context.SaveChanges();
 
-                    // Refresh list and clear form
                     LoadProducts();
                     ClearForm();
                 }
@@ -412,7 +390,6 @@ namespace Tema3_Restaurant
                 return;
             }
 
-            // Check if allergen is already selected
             if (_selectedAllergens.Any(a => a.ID == selectedAllergen.ID))
             {
                 MessageBox.Show("This allergen is already selected.", "Duplicate Selection", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -443,14 +420,12 @@ namespace Tema3_Restaurant
                 return;
             }
 
-            // Load product details
             TxtProductName.Text = selectedProductVM.Name;
             TxtPrice.Text = selectedProductVM.Price.ToString();
             TxtPortionQuantity.Text = selectedProductVM.PortionQuantity.ToString();
             TxtTotalQuantity.Text = selectedProductVM.TotalQuantity.ToString();
             ChkAvailable.IsChecked = selectedProductVM.Available;
 
-            // Set category
             foreach (var category in _categories)
             {
                 if (category.ID == selectedProductVM.CategoryID)
@@ -460,7 +435,6 @@ namespace Tema3_Restaurant
                 }
             }
 
-            // Load image
             if (!string.IsNullOrEmpty(selectedProductVM.ImagePath))
             {
                 string imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, selectedProductVM.ImagePath.TrimStart('/'));
@@ -474,7 +448,6 @@ namespace Tema3_Restaurant
                 ImgProduct.Source = null;
             }
 
-            // Load allergens
             _selectedAllergens.Clear();
             var productAllergens = _context.ProductAllergens
                 .Include(pa => pa.Allergen)

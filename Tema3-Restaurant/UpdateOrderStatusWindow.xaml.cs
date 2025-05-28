@@ -76,7 +76,6 @@ namespace Tema3_Restaurant
 
         private void CmbNewStatus_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // If status is "In Delivery" and no delivery time is set, set default time to now + 30 min
             if (CmbNewStatus.SelectedItem != null &&
                 ((ComboBoxItem)CmbNewStatus.SelectedItem).Content.ToString() == "In Delivery" &&
                 !_selectedDateTime.HasValue)
@@ -96,7 +95,6 @@ namespace Tema3_Restaurant
                 if (int.TryParse(TxtEstimatedDeliveryHour.Text, out int hour) &&
                     int.TryParse(TxtEstimatedDeliveryMinute.Text, out int minute))
                 {
-                    // Validate hour and minute values
                     hour = Math.Min(Math.Max(hour, 0), 23);
                     minute = Math.Min(Math.Max(minute, 0), 59);
 
@@ -134,7 +132,6 @@ namespace Tema3_Restaurant
 
             string newStatus = ((ComboBoxItem)CmbNewStatus.SelectedItem).Content.ToString();
 
-            // Confirm when canceling order
             if (newStatus == "Canceled" &&
                 MessageBox.Show("Are you sure you want to cancel this order?", "Confirm Cancellation",
                     MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
@@ -142,7 +139,6 @@ namespace Tema3_Restaurant
                 return;
             }
 
-            // Update time value before submission
             UpdateSelectedDateTime();
 
             try
@@ -155,7 +151,6 @@ namespace Tema3_Restaurant
                         command.CommandText = "UpdateOrderStatus";
                         command.CommandType = CommandType.StoredProcedure;
 
-                        // Add parameters
                         var orderIdParam = command.CreateParameter();
                         orderIdParam.ParameterName = "@OrderID";
                         orderIdParam.Value = _order.ID;
@@ -179,7 +174,6 @@ namespace Tema3_Restaurant
                         }
                         command.Parameters.Add(deliveryTimeParam);
 
-                        // Execute procedure
                         command.ExecuteNonQuery();
                     }
                 }

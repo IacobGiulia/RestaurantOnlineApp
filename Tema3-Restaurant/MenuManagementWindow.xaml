@@ -75,31 +75,26 @@
 
                     <TextBlock Text="Menu Details" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,15" Grid.Row="0"/>
 
-                    <!-- Name Input -->
                     <StackPanel Grid.Row="1" Margin="0,0,0,10">
                         <TextBlock Text="Menu Name" FontWeight="SemiBold"/>
                         <TextBox x:Name="TxtMenuName" Height="28" Margin="0,5,0,0"/>
                     </StackPanel>
 
-                    <!-- Category Selection -->
                     <StackPanel Grid.Row="2" Margin="0,0,0,10">
                         <TextBlock Text="Category" FontWeight="SemiBold"/>
                         <ComboBox x:Name="CmbCategory" Height="28" Margin="0,5,0,0" DisplayMemberPath="Name"/>
                     </StackPanel>
 
-                    <!-- Available Checkbox -->
                     <StackPanel Grid.Row="3" Margin="0,0,0,10">
                         <CheckBox x:Name="ChkAvailable" Content="Available" IsChecked="True"/>
                     </StackPanel>
 
-                    <!-- Product List Button -->
                     <StackPanel Grid.Row="4" Margin="0,0,0,10">
                         <TextBlock Text="Products in Menu" FontWeight="SemiBold"/>
                         <Button x:Name="BtnManageProducts" Content="Manage Menu Products" Click="BtnManageProducts_Click" 
                                 Height="30" HorizontalAlignment="Left" Margin="0,5,0,0" Width="160"/>
                     </StackPanel>
 
-                    <!-- Products in Menu List -->
                     <ListView x:Name="LvMenuProducts" Grid.Row="5" BorderThickness="1" BorderBrush="#ddd" Background="White" Margin="0,5,0,10">
                         <ListView.View>
                             <GridView>
@@ -110,13 +105,11 @@
                         </ListView.View>
                     </ListView>
 
-                    <!-- Total Price Display -->
                     <StackPanel Grid.Row="6" Margin="0,10,0,15">
                         <TextBlock Text="Total Menu Price:" FontWeight="SemiBold"/>
                         <TextBlock x:Name="TxtTotalPrice" Text="$0.00" FontSize="16" FontWeight="Bold" Foreground="#27ae60" Margin="0,5,0,0"/>
                     </StackPanel>
 
-                    <!-- Save Button -->
                     <Button x:Name="BtnSaveMenu" Content="Save Menu" Click="BtnSaveMenu_Click" 
                             Grid.Row="7" Height="35" Background="#3498db" Foreground="White" FontWeight="SemiBold"/>
                 </Grid>

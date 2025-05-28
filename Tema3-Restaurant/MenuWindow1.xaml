@@ -25,7 +25,6 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Category Filter -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
             <TextBlock Text="Filter by Category: " VerticalAlignment="Center" Margin="0,0,10,0"/>
             <ComboBox Width="200" ItemsSource="{Binding Categories}" 
@@ -40,7 +39,6 @@
             <Button Content="Exit" Click="ExitButton_Click" Margin="20,0,0,0" HorizontalAlignment="Right"/>
         </StackPanel>
 
-        <!-- Keyword Search Section -->
         <Grid Grid.Row="1" Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -73,21 +71,18 @@
 
         <ScrollViewer Grid.Row="2">
             <StackPanel Margin="10">
-                <!-- Results Section -->
+
                 <TextBlock Text="Search Results" FontSize="20" FontWeight="Bold" Margin="0,10,0,10"
                           Visibility="{Binding IsSearchActive, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                <!-- Items grouped by category -->
                 <ItemsControl ItemsSource="{Binding GroupedSearchResults}" 
                              Visibility="{Binding IsSearchActive, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Margin="0,0,0,20">
-                                <!-- Category Header -->
                                 <TextBlock Text="{Binding Key.Name}" FontSize="18" FontWeight="Bold" 
                                           Background="LightGray" Padding="5"/>
 
-                                <!-- Items in this category -->
                                 <ItemsControl ItemsSource="{Binding}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -100,13 +95,11 @@
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
 
-                                                    <!-- Product/Menu Image -->
                                                     <Border Grid.Column="0" Width="100" Height="100" 
                                                            Background="GhostWhite" Margin="0,0,10,0">
                                                         <Image Source="{Binding FirstImagePath}" Stretch="Uniform"/>
                                                     </Border>
 
-                                                    <!-- Product/Menu Details -->
                                                     <StackPanel Grid.Column="1">
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
@@ -116,16 +109,15 @@
                                                         </StackPanel>
                                                         <TextBlock Text="{Binding Category.Name}" FontStyle="Italic" Margin="0,5,0,5"/>
 
-                                                        <!-- Display portion quantity for products -->
+                                                        
                                                         <TextBlock Visibility="{Binding Path=., 
                                                             Converter={StaticResource ProductTypeToVisibilityConverter}}">
                                                             <Run Text="Portion: "/>
                                                             <Run Text="{Binding PortionQuantity, StringFormat='{}{0}g'}"/>
-                                                            <Run Text=" / Total: "/>
-                                                            <Run Text="{Binding TotalQuantity, StringFormat='{}{0}g'}"/>
+              
                                                         </TextBlock>
 
-                                                        <!-- Menu Items for menus -->
+                                                        
                                                         <StackPanel Visibility="{Binding Path=., 
                                                             Converter={StaticResource MenuTypeToVisibilityConverter}}">
                                                             <TextBlock Text="Contents:" FontWeight="SemiBold" Margin="0,5,0,5"/>
@@ -150,7 +142,7 @@
                                                             </ItemsControl>
                                                         </StackPanel>
 
-                                                        <!-- Allergens -->
+                                                        
                                                         <StackPanel Orientation="Horizontal" Margin="0,5,0,0" Visibility="{Binding Path=., Converter={StaticResource ProductTypeToVisibilityConverter}}">
                                                             <TextBlock Text="Allergens: " Margin="0,0,5,0"/>
                                                             <ItemsControl ItemsSource="{Binding ProductAllergens}">
@@ -170,7 +162,7 @@
 
 
 
-                                                    <!-- Price -->
+                                                   
                                                     <StackPanel Grid.Column="2" VerticalAlignment="Top">
                                                         <TextBlock Text="{Binding Price, StringFormat='{}{0:C}'}" 
                                                                   FontWeight="Bold" FontSize="18" Visibility="{Binding Path=., Converter={StaticResource ProductTypeToVisibilityConverter}}"/>
@@ -189,7 +181,7 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- Regular Products Section (when no search is active) -->
+                
                 <TextBlock Text="Individual Items" FontSize="20" FontWeight="Bold" Margin="0,10,0,10"
                           Visibility="{Binding IsSearchActive, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
 
@@ -205,12 +197,12 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <!-- Product Image -->
+                                    
                                     <Border Grid.Column="0" Width="100" Height="100"  Background="LightGray" Margin="0,0,10,0">
                                         <Image Source="{Binding FirstImagePath}" Stretch="Uniform"/>
                                     </Border>
 
-                                    <!-- Product Details -->
+                                    
                                     <StackPanel Grid.Column="1">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
@@ -222,11 +214,9 @@
                                         <TextBlock>
                                             <Run Text="Portion: "/>
                                             <Run Text="{Binding PortionQuantity, StringFormat='{}{0}g'}"/>
-                                            <Run Text=" / Total: "/>
-                                            <Run Text="{Binding TotalQuantity, StringFormat='{}{0}g'}"/>
                                         </TextBlock>
 
-                                        <!-- Allergens -->
+                                       
                                         <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                                             <TextBlock Text="Allergens: " Margin="0,0,5,0"/>
                                             <ItemsControl ItemsSource="{Binding ProductAllergens}">
@@ -244,7 +234,7 @@
                                         </StackPanel>
                                     </StackPanel>
 
-                                    <!-- Price -->
+                                    
                                     <StackPanel Grid.Column="2" VerticalAlignment="Top">
                                         <TextBlock Text="{Binding Price, StringFormat='{}{0:C}'}" FontWeight="Bold" FontSize="18"/>
                                     </StackPanel>
@@ -254,7 +244,7 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- Menus Section (when no search is active) -->
+                
                 <TextBlock Text="Menu Packages" FontSize="20" FontWeight="Bold" Margin="0,20,0,10"
                           Visibility="{Binding IsSearchActive, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
 
@@ -269,7 +259,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <!-- Menu Details -->
+                                   
                                     <StackPanel Grid.Column="0">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
@@ -279,7 +269,7 @@
                                         </StackPanel>
                                         <TextBlock Text="{Binding Category.Name}" FontStyle="Italic" Margin="0,5,0,5"/>
 
-                                        <!-- Menu Items -->
+                                        
                                         <TextBlock Text="Contents:" FontWeight="SemiBold" Margin="0,5,0,5"/>
                                         <ItemsControl ItemsSource="{Binding MenuProducts}">
                                             <ItemsControl.ItemTemplate>
@@ -300,7 +290,7 @@
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
 
-                                        <!-- Allergens -->
+                                        
                                         <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                                             <TextBlock Text="Allergens: " Margin="0,0,5,0"/>
                                             <ItemsControl ItemsSource="{Binding MenuAllergens}">
@@ -318,7 +308,7 @@
                                         </StackPanel>
                                     </StackPanel>
 
-                                    <!-- Price -->
+                                    
                                     <StackPanel Grid.Column="1" VerticalAlignment="Top">
                                         <TextBlock Text="{Binding TotalPrice, StringFormat='{}{0:C}'}" FontWeight="Bold" FontSize="18"/>
                                     </StackPanel>

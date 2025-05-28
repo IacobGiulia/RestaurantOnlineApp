@@ -70,7 +70,6 @@ namespace Tema3_Restaurant
             _context.Allergens.Add(newAllergen);
             _context.SaveChanges();
 
-            // Refresh list
             LoadAllergens();
             TxtAllergenName.Clear();
         }
@@ -90,19 +89,16 @@ namespace Tema3_Restaurant
                 return;
             }
 
-            // Check if new name would create a duplicate (except for the current allergen)
             if (_context.Allergens.Any(a => a.Name == TxtAllergenName.Text && a.ID != selectedAllergen.ID))
             {
                 MessageBox.Show("An allergen with this name already exists.", "Duplicate Entry", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            // Update allergen
             selectedAllergen.Name = TxtAllergenName.Text;
             _context.Entry(selectedAllergen).State = EntityState.Modified;
             _context.SaveChanges();
 
-            // Refresh list
             LoadAllergens();
             TxtAllergenName.Clear();
             LvAllergens.SelectedItem = null;
@@ -117,7 +113,6 @@ namespace Tema3_Restaurant
                 return;
             }
 
-            // Check if allergen is used by any products
             bool isUsed = _context.ProductAllergens.Any(pa => pa.AllergenID == selectedAllergen.ID);
 
             if (isUsed)
@@ -127,7 +122,6 @@ namespace Tema3_Restaurant
                 return;
             }
 
-            // Confirm deletion
             var result = MessageBox.Show($"Are you sure you want to delete the allergen '{selectedAllergen.Name}'?",
                 "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
@@ -136,7 +130,6 @@ namespace Tema3_Restaurant
                 _context.Allergens.Remove(selectedAllergen);
                 _context.SaveChanges();
 
-                // Refresh list
                 LoadAllergens();
                 TxtAllergenName.Clear();
             }

@@ -14,7 +14,6 @@ namespace Tema3_Restaurant.Models
         private bool _canBeCancelled;
         private bool _hasEstimatedDeliveryTime;
 
-        // UI-specific properties
         [System.ComponentModel.DataAnnotations.Schema.NotMapped]
         public bool CanBeCancelled
         {

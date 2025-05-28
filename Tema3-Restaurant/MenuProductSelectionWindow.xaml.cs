@@ -34,7 +34,6 @@ namespace Tema3_Restaurant
             SelectedProducts = new ObservableCollection<MenuProduct>();
             _products = new ObservableCollection<Product>();
 
-            // Copy existing products to our collection
             foreach (var mp in existingProducts)
             {
                 SelectedProducts.Add(new MenuProduct
@@ -70,7 +69,7 @@ namespace Tema3_Restaurant
         {
             if (LvProducts.SelectedItem is Product selectedProduct)
             {
-                // Check if product is already in the menu
+
                 var existingProduct = SelectedProducts.FirstOrDefault(mp => mp.ProductID == selectedProduct.ID);
                 if (existingProduct != null)
                 {
@@ -79,13 +78,11 @@ namespace Tema3_Restaurant
                     return;
                 }
 
-                // Show quantity dialog
                 var quantityDialog = new NumberInputDialog("Enter quantity:", "Add Product to Menu", selectedProduct.PortionQuantity);
                 if (quantityDialog.ShowDialog() == true)
                 {
                     decimal quantity = quantityDialog.ResultValue;
 
-                    // Add the product to selected products
                     SelectedProducts.Add(new MenuProduct
                     {
                         ProductID = selectedProduct.ID,
@@ -121,11 +118,9 @@ namespace Tema3_Restaurant
                 {
                     decimal newQuantity = quantityDialog.ResultValue;
 
-                    // Update the quantity
                     int index = SelectedProducts.IndexOf(selectedMenuProduct);
                     SelectedProducts[index].Quantity = newQuantity;
 
-                    // Refresh the list view
                     LvSelectedProducts.Items.Refresh();
                 }
             }
